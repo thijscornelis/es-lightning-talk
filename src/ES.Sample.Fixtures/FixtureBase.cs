@@ -1,8 +1,9 @@
-﻿using Xunit;
+﻿using ES.Framework.Domain.TypedIdentifiers;
+using Xunit;
 
 namespace ES.Sample.Fixtures
 {
-	 public abstract class FixtureBase : IAsyncLifetime
+	public abstract class FixtureBase : IAsyncLifetime
 	 {
 		  public CancellationTokenSource CancellationTokenSource { get; private set; }
 		  public Exception Throws { get; private set; }
@@ -16,13 +17,13 @@ namespace ES.Sample.Fixtures
 
 		  /// <inheritdoc />
 		  public virtual async Task InitializeAsync() {
-			  try {
-				  Arrange();
-				  await InternalActAsync();
-			  }
-			  catch(Exception ex) {
-				  Throws = ex;
-			  }
+				try {
+					 Arrange();
+					 await InternalActAsync();
+				}
+				catch(Exception ex) {
+					 Throws = ex;
+				}
 		  }
 
 		  /// <inheritdoc />

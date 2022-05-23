@@ -9,6 +9,16 @@
 
   <ItemGroup>
     <Folder Include="Application\" />
+    <Folder Include="Domain\Collections\" />
   </ItemGroup>
+
+	 <ItemGroup>
+		 <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			 <_Parameter1>ES.Sample.Fixtures</_Parameter1>
+		 </AssemblyAttribute>
+		 <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			 <_Parameter1>ES.Framework.Tests</_Parameter1>
+		 </AssemblyAttribute>
+	 </ItemGroup>
 
 </Project>
