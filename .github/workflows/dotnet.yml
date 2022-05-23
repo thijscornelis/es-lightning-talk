@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/ES.Sample.sln
     - name: Build
-      run: dotnet build /src/ES.Sample.sln --no-restore
+      run: dotnet build src/ES.Sample.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test src/ES.Sample.sln --no-build --verbosity normal
