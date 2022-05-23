@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.API", "ES.Sample.API\ES.Sample.API.csproj", "{FCD73776-14AD-4CD9-AC0C-12D1ACC837B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.API", "ES.Sample.API\ES.Sample.API.csproj", "{FCD73776-14AD-4CD9-AC0C-12D1ACC837B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Domain", "ES.Sample.Domain\ES.Sample.Domain.csproj", "{4548F169-9DC6-48DA-A37C-3A0CBC6E14D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Domain", "ES.Sample.Domain\ES.Sample.Domain.csproj", "{4548F169-9DC6-48DA-A37C-3A0CBC6E14D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Application", "ES.Sample.Application\ES.Sample.Application.csproj", "{C07F7F90-695D-499F-9F37-18571E462934}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Application", "ES.Sample.Application\ES.Sample.Application.csproj", "{C07F7F90-695D-499F-9F37-18571E462934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Infrastructure", "ES.Sample.Infrastructure\ES.Sample.Infrastructure.csproj", "{13207C0E-90C8-4748-98B9-D72C09FCC3E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Infrastructure", "ES.Sample.Infrastructure\ES.Sample.Infrastructure.csproj", "{13207C0E-90C8-4748-98B9-D72C09FCC3E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Framework", "ES.Framework\ES.Framework.csproj", "{3DFE3B84-A094-479A-953C-D43AA79BA8D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Framework", "ES.Framework\ES.Framework.csproj", "{3DFE3B84-A094-479A-953C-D43AA79BA8D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{AB5BC2FC-EFE0-45F3-9C39-7A98E4DD6890}"
 EndProject
@@ -19,11 +19,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{2EABAE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EA0980B2-322C-479F-8B5F-1C29FBEFA146}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Domain.Tests", "ES.Sample.Domain.Tests\ES.Sample.Domain.Tests.csproj", "{77D8C380-34CE-4CBB-8DAA-AFD1F8BED5B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Domain.Tests", "ES.Sample.Domain.Tests\ES.Sample.Domain.Tests.csproj", "{77D8C380-34CE-4CBB-8DAA-AFD1F8BED5B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Infrastructure.Tests", "ES.Sample.Infrastructure.Tests\ES.Sample.Infrastructure.Tests.csproj", "{72F7CED4-FCD9-4DD9-905F-7A4ECBB630C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Infrastructure.Tests", "ES.Sample.Infrastructure.Tests\ES.Sample.Infrastructure.Tests.csproj", "{72F7CED4-FCD9-4DD9-905F-7A4ECBB630C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Application.Tests", "ES.Sample.Application.Tests\ES.Sample.Application.Tests.csproj", "{30A34443-C711-475C-BC7C-2EB4D6B7D259}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ES.Sample.Application.Tests", "ES.Sample.Application.Tests\ES.Sample.Application.Tests.csproj", "{30A34443-C711-475C-BC7C-2EB4D6B7D259}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{68BBABEC-FFF2-40DC-98C6-C857F159AD7E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Framework.Tests", "ES.Framework.Tests\ES.Framework.Tests.csproj", "{FA8BC291-AB50-45F1-94C4-1AD18A4225A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ES.Sample.Fixtures", "ES.Sample.Fixtures\ES.Sample.Fixtures.csproj", "{445EA7F9-545C-41C5-ACED-7F811612815D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +72,14 @@ Global
 		{30A34443-C711-475C-BC7C-2EB4D6B7D259}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30A34443-C711-475C-BC7C-2EB4D6B7D259}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30A34443-C711-475C-BC7C-2EB4D6B7D259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA8BC291-AB50-45F1-94C4-1AD18A4225A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA8BC291-AB50-45F1-94C4-1AD18A4225A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA8BC291-AB50-45F1-94C4-1AD18A4225A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA8BC291-AB50-45F1-94C4-1AD18A4225A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{445EA7F9-545C-41C5-ACED-7F811612815D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{445EA7F9-545C-41C5-ACED-7F811612815D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{445EA7F9-545C-41C5-ACED-7F811612815D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{445EA7F9-545C-41C5-ACED-7F811612815D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +93,8 @@ Global
 		{77D8C380-34CE-4CBB-8DAA-AFD1F8BED5B1} = {EA0980B2-322C-479F-8B5F-1C29FBEFA146}
 		{72F7CED4-FCD9-4DD9-905F-7A4ECBB630C7} = {EA0980B2-322C-479F-8B5F-1C29FBEFA146}
 		{30A34443-C711-475C-BC7C-2EB4D6B7D259} = {EA0980B2-322C-479F-8B5F-1C29FBEFA146}
+		{FA8BC291-AB50-45F1-94C4-1AD18A4225A2} = {EA0980B2-322C-479F-8B5F-1C29FBEFA146}
+		{445EA7F9-545C-41C5-ACED-7F811612815D} = {EA0980B2-322C-479F-8B5F-1C29FBEFA146}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D05AE776-2163-4FE1-8959-195DFEF2ABA6}

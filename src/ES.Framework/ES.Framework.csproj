@@ -3,13 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Application\" />
-    <Folder Include="Domain\Abstractions\" />
-    <Folder Include="Infrastructure\" />
   </ItemGroup>
 
 </Project>
