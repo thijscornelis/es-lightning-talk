@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Domain.Aggregates.Design;
+using ES.Framework.Domain.Collections;
 using ES.Framework.Domain.Events.Design;
 using ES.Framework.Domain.Exceptions;
 using ES.Framework.Domain.TypedIdentifiers.Design;

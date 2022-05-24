@@ -1,6 +1,8 @@
 ﻿using ES.Framework.Domain.TypedIdentifiers.Serializers;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace ES.Framework.Infrastructure.Json;
 
@@ -25,4 +27,8 @@ public static class JsonSerializer
 
 	 public static TValue Deserialize<TValue>(this string value) =>
 		 System.Text.Json.JsonSerializer.Deserialize<TValue>(value, _defaultSerializerOptions.Value);
+
+	 public static byte[] SerializeToUtf8Bytes<TValue>(TValue value) =>
+		 System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(value, _defaultSerializerOptions.Value);
+
 }
