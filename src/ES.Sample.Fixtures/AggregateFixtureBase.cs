@@ -9,13 +9,13 @@ public abstract class AggregateFixtureBase<TAggregate, TKey, TState> : FixtureBa
 	where TKey : ITypedIdentifier
 	where TState : class, IAggregateState<TKey>, new()
 {
-	public TAggregate Aggregate { get; private set; }
+	public TAggregate Aggregate { get; protected set; }
 
 	/// <inheritdoc />
 	protected override void Arrange() {
 		base.Arrange();
 		Aggregate = ArrangeAggregate();
-		Aggregate.ClearUncommittedEvents();
+		Aggregate?.ClearUncommittedEvents();
 	}
 
 	/// <inheritdoc />

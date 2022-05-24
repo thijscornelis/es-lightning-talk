@@ -4,7 +4,7 @@ using System.Collections;
 namespace ES.Framework.Domain.Aggregates;
 
 /// <summary>Closed collection which contains IEvent instances</summary>
-internal class EventCollection : IReadOnlyCollection<IEvent>
+public class EventCollection : IReadOnlyCollection<IEvent>
 {
 	private readonly HashSet<IEvent> _events = new();
 

@@ -1,4 +1,5 @@
 using ES.Framework.Domain.Aggregates;
+using ES.Framework.Domain.Events.Design;
 
 namespace ES.Framework.Tests.Mocks;
 
