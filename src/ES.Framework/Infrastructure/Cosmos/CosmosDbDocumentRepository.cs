@@ -3,6 +3,8 @@ using ES.Framework.Domain.Repositories.Design;
 using ES.Framework.Infrastructure.Cosmos.Exceptions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
 namespace ES.Framework.Infrastructure.Cosmos;
 
@@ -19,8 +21,7 @@ public class CosmosDocumentRepository : IDocumentRepository
 
 	 /// <inheritdoc />
 	 public async Task AddAsync<TDocument>(IReadOnlyCollection<TDocument> documents, CancellationToken cancellationToken)
-		  where TDocument : Document
-	 {
+		  where TDocument : Document {
 		  ArgumentNullException.ThrowIfNull(documents);
 
 		  if(!documents.Any())
@@ -41,23 +42,42 @@ public class CosmosDocumentRepository : IDocumentRepository
 		  await _container.CreateItemAsync(document, partitionKey, null, cancellationToken);
 	 }
 
-	 private FeedIterator<Document> GetDocumentFeedIterator(ContinuationToken continuationToken = null) =>
-		 _container.GetItemLinqQueryable<Document>(continuationToken: continuationToken?.Value,
-				 linqSerializerOptions: new CosmosLinqSerializerOptions() {
-					  PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-				 })
-			 .ToFeedIterator();
+	 /// <inheritdoc />
+	 public async Task<(IEnumerable<TDocument>, ContinuationToken)> GetPagedDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
+		  where TDocument : Document {
+		  var feedIterator = GetDocumentFeedIterator(new(partitionKey), whereClause, pageSize, continuationToken);
+		  var feedResponse = await feedIterator.ReadNextAsync(cancellationToken);
+		  return (feedResponse.Resource, new(feedResponse.ContinuationToken));
 
-	 private FeedIterator<Document> GetDocumentFeedIterator(PartitionKey partitionKey,
-		 ContinuationToken continuationToken = null) =>
-		 _container.GetItemLinqQueryable<Document>(continuationToken: continuationToken?.Value,
-				 requestOptions: new() {
-					 PartitionKey = partitionKey
-				 },
-				 linqSerializerOptions: new CosmosLinqSerializerOptions() {
-					 PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
-				 })
-			 .ToFeedIterator();
+	 }
+
+	 /// <inheritdoc />
+	 public async IAsyncEnumerable<TDocument> GetDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+		 where TDocument : Document {
+		  var feedIterator = GetDocumentFeedIterator(new(partitionKey), whereClause);
+		  while(feedIterator.HasMoreResults) {
+				var feedResponse = await feedIterator.ReadNextAsync(cancellationToken);
+				foreach(var document in feedResponse.Resource) {
+					 yield return document;
+				}
+		  }
+	 }
+	 private FeedIterator<TDocument> GetDocumentFeedIterator<TDocument>(PartitionKey partitionKey,
+		 Expression<Func<TDocument, bool>> whereClause = null,
+		 int? pageSize = null,
+		 ContinuationToken continuationToken = null) {
+		  var queryable = _container.GetItemLinqQueryable<TDocument>(continuationToken: continuationToken?.Value,
+					requestOptions: new() {
+						 PartitionKey = partitionKey,
+						 MaxItemCount = pageSize
+					},
+					linqSerializerOptions: new CosmosLinqSerializerOptions() {
+						 PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+					});
+		  return whereClause is not null
+			  ? queryable.Where(whereClause).ToFeedIterator()
+			  : queryable.ToFeedIterator();
+	 }
 
 	 private static PartitionKey DeterminePartitionKey(IReadOnlyCollection<Document> documents) =>
 		 DeterminePartitionKey(documents.ToArray());
@@ -67,12 +87,10 @@ public class CosmosDocumentRepository : IDocumentRepository
 		  ThrowIfPartitionKeyIsNullOrEmpty(value);
 		  return new PartitionKey(value);
 	 }
-
 	 private static void ThrowIfPartitionKeyIsNullOrEmpty(string value) {
 		  if(string.IsNullOrWhiteSpace(value))
 				throw new ArgumentNullException(nameof(value));
 	 }
-
 	 private static void ThrowIfMultiplePartitionKeysDetected(params Document[] documents) {
 		  var partitionKeys = documents.Select(x => x.PartitionKey).Distinct();
 		  if(partitionKeys.Count() > 1)
