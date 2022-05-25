@@ -13,9 +13,7 @@ public class CosmosDocumentRepository : IDocumentRepository
 {
 	 private readonly Container _container;
 
-	 /// <summary>
-	 ///     Initializes a new instance of the <see cref="CosmosDocumentRepository" /> class.
-	 /// </summary>
+	 /// <summary>Initializes a new instance of the <see cref="CosmosDocumentRepository" /> class.</summary>
 	 /// <param name="container">The container.</param>
 	 public CosmosDocumentRepository(Container container) => _container = container;
 
@@ -43,13 +41,14 @@ public class CosmosDocumentRepository : IDocumentRepository
 	 }
 
 	 /// <inheritdoc />
-	 public async Task<(IEnumerable<TDocument>, ContinuationToken)> GetPagedDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
-		  where TDocument : Document {
-		  var feedIterator = GetDocumentFeedIterator(new(partitionKey), whereClause, pageSize, continuationToken);
-		  var feedResponse = await feedIterator.ReadNextAsync(cancellationToken);
-		  return (feedResponse.Resource, new(feedResponse.ContinuationToken));
+	 public async Task DeleteAsync<TDocument>(TDocument document, CancellationToken cancellationToken)
+	 where TDocument : Document
+		 => await DeleteAsync<TDocument>(document.Id, document.PartitionKey, cancellationToken);
 
-	 }
+	 /// <inheritdoc />
+	 public async Task DeleteAsync<TDocument>(DocumentId documentId, string partitionKey, CancellationToken cancellationToken)
+		 where TDocument : Document =>
+		 await _container.DeleteItemAsync<TDocument>(documentId.Value, GetPartitionKey(partitionKey), cancellationToken: cancellationToken);
 
 	 /// <inheritdoc />
 	 public async IAsyncEnumerable<TDocument> GetDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -62,8 +61,42 @@ public class CosmosDocumentRepository : IDocumentRepository
 				}
 		  }
 	 }
+
+	 /// <inheritdoc />
+	 public async Task<(IEnumerable<TDocument>, ContinuationToken)> GetPagedDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
+		  where TDocument : Document {
+		  var feedIterator = GetDocumentFeedIterator(GetPartitionKey(partitionKey), whereClause, pageSize, continuationToken);
+		  var feedResponse = await feedIterator.ReadNextAsync(cancellationToken);
+		  return (feedResponse.Resource, new(feedResponse.ContinuationToken));
+	 }
+
+	 private static PartitionKey DeterminePartitionKey(IReadOnlyCollection<Document> documents) =>
+		 DeterminePartitionKey(documents.ToArray());
+
+	 private static PartitionKey DeterminePartitionKey(params Document[] documents) {
+		  ThrowIfMultiplePartitionKeysDetected(documents);
+		  var value = documents.First().PartitionKey;
+		  return GetPartitionKey(value);
+	 }
+
+	 private static PartitionKey GetPartitionKey(string value) {
+		  ThrowIfPartitionKeyIsNullOrEmpty(value);
+		  return new PartitionKey(value);
+	 }
+
+	 private static void ThrowIfMultiplePartitionKeysDetected(params Document[] documents) {
+		  var partitionKeys = documents.Select(x => x.PartitionKey).Distinct();
+		  if(partitionKeys.Count() > 1)
+				throw new MultiplePartitionKeysDetected();
+	 }
+
+	 private static void ThrowIfPartitionKeyIsNullOrEmpty(string value) {
+		  if(string.IsNullOrWhiteSpace(value))
+				throw new ArgumentNullException(nameof(value));
+	 }
+
 	 private FeedIterator<TDocument> GetDocumentFeedIterator<TDocument>(PartitionKey partitionKey,
-		 Expression<Func<TDocument, bool>> whereClause = null,
+									Expression<Func<TDocument, bool>> whereClause = null,
 		 int? pageSize = null,
 		 ContinuationToken continuationToken = null) {
 		  var queryable = _container.GetItemLinqQueryable<TDocument>(continuationToken: continuationToken?.Value,
@@ -77,23 +110,5 @@ public class CosmosDocumentRepository : IDocumentRepository
 		  return whereClause is not null
 			  ? queryable.Where(whereClause).ToFeedIterator()
 			  : queryable.ToFeedIterator();
-	 }
-
-	 private static PartitionKey DeterminePartitionKey(IReadOnlyCollection<Document> documents) =>
-		 DeterminePartitionKey(documents.ToArray());
-	 private static PartitionKey DeterminePartitionKey(params Document[] documents) {
-		  ThrowIfMultiplePartitionKeysDetected(documents);
-		  var value = documents.First().PartitionKey;
-		  ThrowIfPartitionKeyIsNullOrEmpty(value);
-		  return new PartitionKey(value);
-	 }
-	 private static void ThrowIfPartitionKeyIsNullOrEmpty(string value) {
-		  if(string.IsNullOrWhiteSpace(value))
-				throw new ArgumentNullException(nameof(value));
-	 }
-	 private static void ThrowIfMultiplePartitionKeysDetected(params Document[] documents) {
-		  var partitionKeys = documents.Select(x => x.PartitionKey).Distinct();
-		  if(partitionKeys.Count() > 1)
-				throw new MultiplePartitionKeysDetected();
 	 }
 }
