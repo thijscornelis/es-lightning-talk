@@ -4,6 +4,7 @@ using ES.Framework.Infrastructure.Cosmos.Exceptions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace ES.Framework.Infrastructure.Cosmos;
@@ -18,40 +19,45 @@ public class CosmosDocumentRepository : IDocumentRepository
 	 public CosmosDocumentRepository(Container container) => _container = container;
 
 	 /// <inheritdoc />
-	 public async Task AddAsync<TDocument>(IReadOnlyCollection<TDocument> documents, CancellationToken cancellationToken)
+	 public async Task<bool> AddAsync<TDocument>(IReadOnlyCollection<TDocument> documents, CancellationToken cancellationToken)
 		  where TDocument : Document {
 		  ArgumentNullException.ThrowIfNull(documents);
 
 		  if(!documents.Any())
-				return;
+				return true;
 
 		  var partitionKey = DeterminePartitionKey(documents);
 		  var transactionalBatch = _container.CreateTransactionalBatch(partitionKey);
 		  foreach(var document in documents)
 				transactionalBatch.CreateItem(document);
-		  await transactionalBatch.ExecuteAsync(cancellationToken);
+		  var itemResponse = await transactionalBatch.ExecuteAsync(cancellationToken);
+		  return itemResponse.StatusCode.Equals(HttpStatusCode.OK);
 	 }
 
 	 /// <inheritdoc />
-	 public async Task AddAsync<TDocument>(TDocument document, CancellationToken cancellationToken)
+	 public async Task<bool> AddAsync<TDocument>(TDocument document, CancellationToken cancellationToken)
 	 where TDocument : Document {
 		  ArgumentNullException.ThrowIfNull(document);
 		  var partitionKey = DeterminePartitionKey(document);
-		  await _container.CreateItemAsync(document, partitionKey, null, cancellationToken);
+		  var itemResponse = await _container.CreateItemAsync(document, partitionKey, null, cancellationToken);
+		  return itemResponse.StatusCode.Equals(HttpStatusCode.OK);
 	 }
 
 	 /// <inheritdoc />
-	 public async Task DeleteAsync<TDocument>(TDocument document, CancellationToken cancellationToken)
+	 public async Task<bool> DeleteAsync<TDocument>(TDocument document, CancellationToken cancellationToken)
 	 where TDocument : Document
 		 => await DeleteAsync<TDocument>(document.Id, document.PartitionKey, cancellationToken);
 
 	 /// <inheritdoc />
-	 public async Task DeleteAsync<TDocument>(DocumentId documentId, string partitionKey, CancellationToken cancellationToken)
-		 where TDocument : Document =>
-		 await _container.DeleteItemAsync<TDocument>(documentId.Value, GetPartitionKey(partitionKey), cancellationToken: cancellationToken);
+	 public async Task<bool> DeleteAsync<TDocument>(DocumentId documentId, string partitionKey, CancellationToken cancellationToken)
+		 where TDocument : Document {
+		  var response = await _container.DeleteItemAsync<TDocument>(documentId.Value, GetPartitionKey(partitionKey),
+			  cancellationToken: cancellationToken);
+		  return response.StatusCode.Equals(HttpStatusCode.OK);
+	 }
 
 	 /// <inheritdoc />
-	 public async IAsyncEnumerable<TDocument> GetDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+	 public async IAsyncEnumerable<TDocument> GetAsyncEnumerable<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
 		 where TDocument : Document {
 		  var feedIterator = GetDocumentFeedIterator(new(partitionKey), whereClause);
 		  while(feedIterator.HasMoreResults) {
@@ -63,7 +69,7 @@ public class CosmosDocumentRepository : IDocumentRepository
 	 }
 
 	 /// <inheritdoc />
-	 public async Task<(IEnumerable<TDocument>, ContinuationToken)> GetPagedDocumentsAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
+	 public async Task<(IEnumerable<TDocument>, ContinuationToken)> GetPageAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
 		  where TDocument : Document {
 		  var feedIterator = GetDocumentFeedIterator(GetPartitionKey(partitionKey), whereClause, pageSize, continuationToken);
 		  var feedResponse = await feedIterator.ReadNextAsync(cancellationToken);

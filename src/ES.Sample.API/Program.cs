@@ -6,13 +6,10 @@ using ES.Framework.Infrastructure.Json;
 using ES.Sample.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Add services to the container. Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(c => new CosmosClient("https://localhost:8081",
@@ -55,19 +52,16 @@ if(app.Environment.IsDevelopment()) {
 app.UseHttpsRedirection();
 
 app.MapGet("api/documents/{id}", async ([FromRoute] Guid id, IDocumentRepository repository, CancellationToken cancellationToken) => {
-
 	 var partitionKey = $"BankAccount-{id:N}";
 
 	 ContinuationToken continuationToken = new(null);
 	 List<EventDocument> list = new List<EventDocument>();
 	 do {
-		 (var enumerable, continuationToken) = await repository.GetPagedDocumentsAsync<EventDocument>(partitionKey, pageSize: 2, continuationToken:continuationToken,
-				 cancellationToken: cancellationToken);
+		  (var enumerable, continuationToken) = await repository.GetPageAsync<EventDocument>(partitionKey, pageSize: 2, continuationToken: continuationToken,
+				  cancellationToken: cancellationToken);
 
-		 list.AddRange(enumerable);
+		  list.AddRange(enumerable);
 	 } while(continuationToken.Value != null);
-	 
-	
 
 	 return Results.Json(list, JsonSerializer.DefaultSerializerOptions.Value);
 });
@@ -88,7 +82,6 @@ app.MapPost("api/documents", async (IDocumentRepository repository, Cancellation
 	 };
 
 	 await repository.AddAsync(document, cancellationToken);
-
 });
 
 await EnsureDatabaseAvailability(app);

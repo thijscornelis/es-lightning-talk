@@ -1,19 +1,18 @@
-﻿using ES.Framework.Domain.TypedIdentifiers;
-using Xunit;
+﻿using Xunit;
 
 namespace ES.Sample.Fixtures
 {
-	public abstract class FixtureBase : IAsyncLifetime
+	 public abstract class FixtureBase : IAsyncLifetime
 	 {
 		  public CancellationTokenSource CancellationTokenSource { get; private set; }
-		  public Exception Throws { get; private set; }
 		  public bool HasExecutedSuccessfully => Throws == null;
+		  public Exception Throws { get; private set; }
 
-		  protected virtual void Arrange() => CancellationTokenSource = ArrangeCancellationTokenSource();
-
-		  protected virtual CancellationTokenSource ArrangeCancellationTokenSource() => new();
-
-		  protected abstract Task InternalActAsync();
+		  /// <inheritdoc />
+		  public Task DisposeAsync() {
+				CancellationTokenSource.Dispose();
+				return Task.CompletedTask;
+		  }
 
 		  /// <inheritdoc />
 		  public virtual async Task InitializeAsync() {
@@ -26,10 +25,10 @@ namespace ES.Sample.Fixtures
 				}
 		  }
 
-		  /// <inheritdoc />
-		  public Task DisposeAsync() {
-				CancellationTokenSource.Dispose();
-				return Task.CompletedTask;
-		  }
+		  protected virtual void Arrange() => CancellationTokenSource = ArrangeCancellationTokenSource();
+
+		  protected virtual CancellationTokenSource ArrangeCancellationTokenSource() => new();
+
+		  protected abstract Task InternalActAsync();
 	 }
 }
