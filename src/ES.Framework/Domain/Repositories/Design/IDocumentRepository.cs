@@ -38,6 +38,14 @@ public interface IDocumentRepository
 	 public Task<bool> DeleteAsync<TDocument>(DocumentId documentId, string partitionKey, CancellationToken cancellationToken)
 		 where TDocument : Document;
 
+	 /// <summary>
+	 /// Gets an <see cref="IAsyncEnumerable{TDocument}"/> that retrieves documents from the document database asynchronously.
+	 /// </summary>
+	 /// <typeparam name="TDocument">The type of document.</typeparam>
+	 /// <param name="partitionKey">The partition key.</param>
+	 /// <param name="whereClause">The where clause.</param>
+	 /// <param name="cancellationToken">The cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+	 /// <returns>IAsyncEnumerable&lt;TDocument&gt;.</returns>
 	 IAsyncEnumerable<TDocument> GetAsyncEnumerable<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, CancellationToken cancellationToken = default)
 		 where TDocument : Document;
 
