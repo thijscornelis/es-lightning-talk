@@ -1,4 +1,4 @@
-﻿using ES.Framework.Domain.Repositories;
+﻿using ES.Framework.Domain.Documents;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Moq;
@@ -25,7 +25,7 @@ public class WhenAddingMultipleDocumentsAndDatabaseNotReturningHttpStatusOk : IC
 			new() {
 				Id = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
 				PartitionKey = "UNIT_TEST_PARTITION_KEY",
-				Version = 1,
+				AggregateVersion = 1,
 				Timestamp = DateTime.UtcNow
 			}
 		};

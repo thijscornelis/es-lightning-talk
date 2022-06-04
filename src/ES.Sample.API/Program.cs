@@ -1,7 +1,13 @@
+using ES.Framework.Domain;
+using ES.Framework.Domain.Abstractions;
+using ES.Framework.Domain.Documents;
+using ES.Framework.Domain.Documents.Design;
 using ES.Framework.Domain.Repositories;
 using ES.Framework.Domain.Repositories.Design;
+using ES.Framework.Infrastructure.Attributes;
 using ES.Framework.Infrastructure.Cosmos;
 using ES.Framework.Infrastructure.Cosmos.Json;
+using ES.Framework.Infrastructure.Dates;
 using ES.Framework.Infrastructure.Json;
 using ES.Sample.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +24,18 @@ builder.Services.AddScoped(c => new CosmosClient("https://localhost:8081",
 		 ConnectionMode = ConnectionMode.Gateway
 	}));
 
+builder.Services.AddTransient<IDateTimeProvider, UniversalDateTimeProvider>();
+builder.Services.AddTransient<IAttributeValueResolver, AttributeValueResolver>();
+builder.Services.AddTransient(typeof(IEventDocumentConverter<,,,>), typeof(EventDocumentConverter<,,,>));
+builder.Services.AddTransient(typeof(IAggregateRepository<,,,>), typeof(AggregateRepository<,,,>));
+
 builder.Services.AddScoped(c => {
-	 var client = c.GetService<CosmosClient>() ??
-					  throw new ArgumentNullException(nameof(CosmosClient), "Could not be resolved by the IOC");
+	 var client = c.GetService<CosmosClient>() ?? throw new ArgumentNullException(nameof(CosmosClient), "Could not be resolved by the IOC");
 	 return client.GetDatabase("es-database");
 });
 
 builder.Services.AddTransient<IDocumentRepository, CosmosDocumentRepository>(c => {
-	 var database = c.GetService<Database>() ??
-						 throw new ArgumentNullException(nameof(Database), "Could not be resolved by the IOC");
+	 var database = c.GetService<Database>() ?? throw new ArgumentNullException(nameof(Database), "Could not be resolved by the IOC");
 	 var container = database.GetContainer("es-framework");
 	 return new CosmosDocumentRepository(container);
 });
@@ -78,7 +87,7 @@ app.MapPost("api/documents", async (IDocumentRepository repository, Cancellation
 		  EventType = @event.GetType().FullName,
 		  Payload = @event,
 		  Timestamp = DateTime.UtcNow,
-		  Version = 1000
+		  AggregateVersion = 1000
 	 };
 
 	 await repository.AddAsync(document, cancellationToken);

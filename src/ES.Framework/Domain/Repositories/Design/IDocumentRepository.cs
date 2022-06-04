@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using ES.Framework.Domain.Documents;
+using System.Linq.Expressions;
 
 namespace ES.Framework.Domain.Repositories.Design;
 

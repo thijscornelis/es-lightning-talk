@@ -1,6 +1,5 @@
 ﻿using ES.Framework.Tests.Mocks;
 using FluentAssertions;
-using System.Reflection;
 
 namespace ES.Framework.Tests.Aggregates;
 
@@ -12,10 +11,8 @@ public class
 	 public WhenCreatingAggregateUsingPublicConstructor(Fixture fixture) => _fixture = fixture;
 
 	 [Fact]
-	 public void ItShouldHaveUncommittedEvent() => _fixture.Aggregate.UncommittedEvents.Should().ContainSingle().And
-		 .Contain(new TestAggregateCreated(_fixture.TestAggregateId, _fixture.TestAggregateName));
-	 [Fact]
-	 public void ItShouldSucceed() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
+	 public void ItShouldExposeAggregateId() => _fixture.Aggregate.Id.Should().Be(_fixture.TestAggregateId);
+
 	 [Fact]
 	 public void ItShouldHaveAppliedEventToState() => _fixture.Aggregate.State.Should().NotBeNull().And.Be(
 		 new TestAggregateState {
@@ -24,10 +21,18 @@ public class
 		 });
 
 	 [Fact]
-	 public void ItShouldExposeAggregateId() => _fixture.Aggregate.Id.Should().Be(_fixture.TestAggregateId);
+	 public void ItShouldHaveBumpedVersionNumber() => _fixture.Aggregate.Version.Should().Be(1);
 
 	 [Fact]
-	 public void ItShouldHaveBumpedVersionNumber() => _fixture.Aggregate.Version.Should().Be(1);
+	 public void ItShouldHaveUncommittedEvent() => _fixture.Aggregate.UncommittedEvents.Should().ContainSingle().And
+		 .Contain(new TestAggregateCreated {
+			  Id = _fixture.TestAggregateId,
+			  Name = _fixture.TestAggregateName,
+			  Version = 1
+		 });
+
+	 [Fact]
+	 public void ItShouldSucceed() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
 
 	 public class Fixture : FixtureBase
 	 {
@@ -37,9 +42,9 @@ public class
 		  public string TestAggregateName { get; } = "TEST AGGREGATE NAME";
 
 		  /// <inheritdoc />
-		  protected override TestAggregate ArrangeAggregate() => null;
+		  protected override void Act() => Aggregate = new TestAggregate(TestAggregateId, TestAggregateName);
 
 		  /// <inheritdoc />
-		  protected override void Act() => Aggregate = new TestAggregate(TestAggregateId, TestAggregateName);
+		  protected override TestAggregate ArrangeAggregate() => null;
 	 }
 }
