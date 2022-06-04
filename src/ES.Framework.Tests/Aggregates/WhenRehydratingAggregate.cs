@@ -56,7 +56,7 @@ public class WhenRehydratingAggregate : IClassFixture<WhenRehydratingAggregate.F
 		  protected override TestAggregate ArrangeAggregate() => null;
 
 		  private EventCollection<TestAggregateId> ArrangeEventCollection() => new()
-			  {new TestAggregateDescriptionChanged {Id = TestAggregateId, Description = TestAggregateDescription}};
+			  {new TestAggregateDescriptionChanged(TestAggregateId) {  Description = TestAggregateDescription}};
 
 		  private Snapshot<TestAggregateId, TestAggregateState> ArrangeSnapshot() =>
 			  new() {

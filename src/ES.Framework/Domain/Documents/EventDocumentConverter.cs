@@ -1,6 +1,7 @@
 ﻿using ES.Framework.Domain.Abstractions;
 using ES.Framework.Domain.Aggregates.Design;
 using ES.Framework.Domain.Documents.Design;
+using ES.Framework.Domain.Events;
 using ES.Framework.Domain.Events.Design;
 using ES.Framework.Domain.Exceptions;
 using ES.Framework.Domain.TypedIdentifiers.Design;
@@ -17,7 +18,7 @@ public class EventDocumentConverter<TAggregate, TKey, TState, TValue> : IEventDo
 	 private readonly IDateTimeProvider _dateTimeProvider;
 	 private readonly IPartitionKeyResolver<TAggregate, TKey, TState, TValue> _partitionKeyResolver;
 
-	 /// <summary>Initializes a new instance of the <see cref="EventDocumentConverter{TAggregate,TKey,TState}" /> class.</summary>
+	 /// <summary>Initializes a new instance of the <see cref="EventDocumentConverter{TAggregate,TKey,TState, TValue}" /> class.</summary>
 	 /// <param name="dateTimeProvider">The date time provider.</param>
 	 /// <param name="partitionKeyResolver">The partition key resolver.</param>
 	 public EventDocumentConverter(IDateTimeProvider dateTimeProvider, IPartitionKeyResolver<TAggregate, TKey, TState, TValue> partitionKeyResolver) {
@@ -26,15 +27,15 @@ public class EventDocumentConverter<TAggregate, TKey, TState, TValue> : IEventDo
 	 }
 
 	 /// <inheritdoc />
-	 public IAggregateEvent<TKey> ToEvent(EventDocument document) {
+	 public AggregateEvent<TKey> ToEvent(EventDocument document) {
 		  var jsonElement = (JsonElement) document.Payload;
 		  var json = jsonElement.GetRawText();
 		  var type = Type.GetType(document.EventType) ?? throw new EventTypeNotFoundException($"Type {document.EventType} could not be found in assemblies");
-		  return JsonSerializer.Deserialize(json, type) as IAggregateEvent<TKey>;
+		  return JsonSerializer.Deserialize(json, type) as AggregateEvent<TKey>;
 	 }
 
 	 /// <inheritdoc />
-	 public IReadOnlyCollection<EventDocument> ToEventDocuments(IReadOnlyCollection<IAggregateEvent<TKey>> events) {
+	 public IReadOnlyCollection<EventDocument> ToEventDocuments(IReadOnlyCollection<AggregateEvent<TKey>> events) {
 		  ArgumentNullException.ThrowIfNull(events);
 		  var result = new List<EventDocument>();
 		  foreach(var @event in events)

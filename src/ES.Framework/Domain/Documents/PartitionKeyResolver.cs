@@ -6,10 +6,11 @@ using ES.Framework.Domain.TypedIdentifiers.Design;
 
 namespace ES.Framework.Domain.Documents;
 
-/// <summary>Class PartitionKeyResolver.</summary>
-/// <typeparam name="TAggregate">The type of the t aggregate.</typeparam>
-/// <typeparam name="TKey">The type of the t key.</typeparam>
-/// <typeparam name="TState">The type of the t state.</typeparam>
+/// <summary>PartitionKeyResolver that translates the format from <see cref="AggregatePartitionKeyAttribute" /> using a list of arguments to the actual partition key</summary>
+/// <typeparam name="TAggregate">The type of the aggregate.</typeparam>
+/// <typeparam name="TKey">The type of the key.</typeparam>
+/// <typeparam name="TState">The type of the state.</typeparam>
+/// <typeparam name="TValue">The type of the value.</typeparam>
 public class PartitionKeyResolver<TAggregate, TKey, TState, TValue> : IPartitionKeyResolver<TAggregate, TKey, TState, TValue>
 	 where TAggregate : Aggregate<TKey, TState>
 	 where TState : class, IAggregateState<TKey>, new()

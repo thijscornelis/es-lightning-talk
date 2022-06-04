@@ -20,8 +20,8 @@ public class TestAggregate : Aggregate<TestAggregateId, TestAggregateState>
 	 public TestAggregate(string name) : this(TestAggregateId.CreateNew(), name) {
 	 }
 
-	 public TestAggregate(TestAggregateId id, string name) : this() => Apply(new TestAggregateCreated {
-		  Id = id, Name = name
+	 public TestAggregate(TestAggregateId id, string name) : this() => Apply(new TestAggregateCreated(id) {
+		  Name = name
 	 });
 
 	 /// <inheritdoc />
@@ -35,8 +35,8 @@ public class TestAggregate : Aggregate<TestAggregateId, TestAggregateState>
 				return;
 		  if(State.Description != null && State.Description.Equals(value))
 				return;
-		  Apply(new TestAggregateDescriptionChanged {
-				Id = Id, Description = value
+		  Apply(new TestAggregateDescriptionChanged(Id) {
+				Description = value
 		  });
 	 }
 

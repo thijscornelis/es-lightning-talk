@@ -9,7 +9,7 @@ using ES.Framework.Infrastructure.Cosmos;
 using ES.Framework.Infrastructure.Cosmos.Json;
 using ES.Framework.Infrastructure.Dates;
 using ES.Framework.Infrastructure.Json;
-using ES.Sample.Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
@@ -75,22 +75,7 @@ app.MapGet("api/documents/{id}", async ([FromRoute] Guid id, IDocumentRepository
 	 return Results.Json(list, JsonSerializer.DefaultSerializerOptions.Value);
 });
 
-app.MapPost("api/documents", async (IDocumentRepository repository, CancellationToken cancellationToken) => {
-	 var @event = new BankAccountCreated() {
-		  Id = BankAccountId.CreateNew(),
-		  Name = "blaat"
-	 };
-	 var document = new EventDocument() {
-		  PartitionKey = $"BankAccount-{@event.Id.TypedValue:N}",
-		  Id = DocumentId.CreateNew(),
-		  AggregateId = @event.Id.Value,
-		  EventType = @event.GetType().FullName,
-		  Payload = @event,
-		  Timestamp = DateTime.UtcNow,
-		  AggregateVersion = 1000
-	 };
-
-	 await repository.AddAsync(document, cancellationToken);
+app.MapPost("api/bank-accounts", async (IMediator mediator, CancellationToken cancellationToken) => {
 });
 
 await EnsureDatabaseAvailability(app);

@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Domain.Aggregates.Design;
+using ES.Framework.Domain.Events;
 using ES.Framework.Domain.Events.Design;
 using ES.Framework.Domain.TypedIdentifiers.Design;
 
@@ -13,10 +14,10 @@ public interface IEventDocumentConverter<in TAggregate, TKey, in TState, TValue>
 	 /// <summary>Converts to event.</summary>
 	 /// <param name="document">The document.</param>
 	 /// <returns>IReadOnlyCollection&lt;IAggregateEvent&lt;TKey&gt;&gt;.</returns>
-	 public IAggregateEvent<TKey> ToEvent(EventDocument document);
+	 public AggregateEvent<TKey> ToEvent(EventDocument document);
 
 	 /// <summary>Creates an <see cref="EventDocument" /> for the each of the specified <see cref="IEvent" />.</summary>
 	 /// <param name="events">The events.</param>
 	 /// <returns><see cref="IReadOnlyCollection{EventDocument}" /></returns>
-	 public IReadOnlyCollection<EventDocument> ToEventDocuments(IReadOnlyCollection<IAggregateEvent<TKey>> events);
+	 public IReadOnlyCollection<EventDocument> ToEventDocuments(IReadOnlyCollection<AggregateEvent<TKey>> events);
 }

@@ -7,22 +7,27 @@ public abstract class AttributeFixtureBase<TClass, TAttribute> : Sample.Fixtures
 	where TAttribute : Attribute
 	where TClass : class
 {
-	public TAttribute Attribute { get; private set; }
-	public IAttributeValueResolver Resolver { get; private set; }
+	 /// <summary>Gets the attribute.</summary>
+	 /// <value>The attribute.</value>
+	 public TAttribute Attribute { get; private set; }
 
-	protected virtual void Act() => Attribute = Resolver.GetValue<TAttribute>(typeof(TClass));
+	 /// <summary>Gets the resolver.</summary>
+	 /// <value>The resolver.</value>
+	 public IAttributeValueResolver Resolver { get; private set; }
 
-	/// <inheritdoc />
-	protected override void Arrange() {
-		base.Arrange();
-		Resolver = ArrangeResolver();
-	}
+	 protected virtual void Act() => Attribute = Resolver.GetValue<TAttribute>(typeof(TClass));
 
-	protected virtual IAttributeValueResolver ArrangeResolver() => new AttributeValueResolver();
+	 /// <inheritdoc />
+	 protected override void Arrange() {
+		  base.Arrange();
+		  Resolver = ArrangeResolver();
+	 }
 
-	/// <inheritdoc />
-	protected override Task InternalActAsync() {
-		Act();
-		return Task.CompletedTask;
-	}
+	 protected virtual IAttributeValueResolver ArrangeResolver() => new AttributeValueResolver();
+
+	 /// <inheritdoc />
+	 protected override Task InternalActAsync() {
+		  Act();
+		  return Task.CompletedTask;
+	 }
 }

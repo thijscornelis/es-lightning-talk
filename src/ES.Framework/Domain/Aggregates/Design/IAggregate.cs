@@ -1,4 +1,4 @@
-﻿using ES.Framework.Domain.Events.Design;
+﻿using ES.Framework.Domain.Events;
 using ES.Framework.Domain.TypedIdentifiers.Design;
 
 namespace ES.Framework.Domain.Aggregates.Design;
@@ -20,7 +20,7 @@ public interface IAggregate<TKey, out TState>
 
 	 /// <summary>Gets the uncommitted events.</summary>
 	 /// <value>The uncommitted events.</value>
-	 public IReadOnlyCollection<IAggregateEvent<TKey>> UncommittedEvents { get; }
+	 public IReadOnlyCollection<AggregateEvent<TKey>> UncommittedEvents { get; }
 
 	 /// <summary>Gets the version.</summary>
 	 /// <value>The version.</value>

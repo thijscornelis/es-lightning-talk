@@ -9,6 +9,8 @@ public abstract class AggregateFixtureBase<TAggregate, TKey, TState> : FixtureBa
 	where TKey : ITypedIdentifier
 	where TState : class, IAggregateState<TKey>, new()
 {
+	 /// <summary>Gets or sets the aggregate.</summary>
+	 /// <value>The aggregate.</value>
 	 public TAggregate Aggregate { get; protected set; }
 
 	 protected abstract void Act();

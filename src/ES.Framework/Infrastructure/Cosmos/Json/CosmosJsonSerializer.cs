@@ -1,14 +1,11 @@
 ﻿using ES.Framework.Infrastructure.Cosmos.Exceptions;
 using Microsoft.Azure.Cosmos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using JsonSerializer = ES.Framework.Infrastructure.Json.JsonSerializer;
 
 namespace ES.Framework.Infrastructure.Cosmos.Json;
+
 /// <summary>By default CosmosDB SDK uses Newtonsoft, this is the System.Text implementation instead</summary>
 /// <seealso cref="Microsoft.Azure.Cosmos.CosmosSerializer" />
 public class CosmosJsonSerializer : CosmosSerializer
@@ -26,7 +23,6 @@ public class CosmosJsonSerializer : CosmosSerializer
 				Indented = false,
 				SkipValidation = false
 		  };
-
 	 }
 
 	 /// <summary>Convert a Stream of JSON to an object. The implementation is responsible for Disposing of the stream, including when an exception is thrown, to avoid memory leaks.</summary>

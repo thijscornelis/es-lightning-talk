@@ -24,12 +24,14 @@ public class
 	 public void ItShouldHaveBumpedVersionNumber() => _fixture.Aggregate.Version.Should().Be(1);
 
 	 [Fact]
-	 public void ItShouldHaveUncommittedEvent() => _fixture.Aggregate.UncommittedEvents.Should().ContainSingle().And
-		 .Contain(new TestAggregateCreated {
-			  Id = _fixture.TestAggregateId,
-			  Name = _fixture.TestAggregateName,
-			  Version = 1
-		 });
+	 public void ItShouldHaveUncommittedEvent() {
+		  var expected = new TestAggregateCreated(_fixture.TestAggregateId) {
+				Name = _fixture.TestAggregateName
+		  };
+		  expected.SetVersion(1);
+		  _fixture.Aggregate.UncommittedEvents.Should().ContainSingle().And
+			  .Contain(expected);
+	 }
 
 	 [Fact]
 	 public void ItShouldSucceed() => _fixture.HasExecutedSuccessfully.Should().BeTrue();

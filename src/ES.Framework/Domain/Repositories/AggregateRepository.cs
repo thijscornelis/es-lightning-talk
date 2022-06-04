@@ -10,6 +10,7 @@ using ES.Framework.Domain.TypedIdentifiers.Design;
 
 namespace ES.Framework.Domain.Repositories;
 
+/// <inheritdoc />
 public class AggregateRepository<TAggregate, TKey, TState, TValue> : IAggregateRepository<TAggregate, TKey, TState, TValue>
 	where TState : class, IAggregateState<TKey>, new()
 	where TKey : ITypedIdentifier<TValue>

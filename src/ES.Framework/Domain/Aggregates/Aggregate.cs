@@ -1,6 +1,6 @@
 ﻿using ES.Framework.Domain.Aggregates.Design;
 using ES.Framework.Domain.Collections;
-using ES.Framework.Domain.Events.Design;
+using ES.Framework.Domain.Events;
 using ES.Framework.Domain.Exceptions;
 using ES.Framework.Domain.TypedIdentifiers.Design;
 using System.Reflection;
@@ -13,7 +13,7 @@ public abstract class Aggregate<TKey, TState> : IAggregate<TKey, TState>
 	where TState : class, IAggregateState<TKey>, new()
 {
 	 internal readonly EventCollection<TKey> _uncommittedEvents = new();
-	 private readonly Dictionary<Type, EventHandlerAction<IAggregateEvent<TKey>>> _handlers = new();
+	 private readonly Dictionary<Type, EventHandlerAction<AggregateEvent<TKey>>> _handlers = new();
 
 	 /// <summary>Initializes a new instance of the <see cref="Aggregate{TKey, TState}" /> class.</summary>
 	 protected internal Aggregate() { }
@@ -22,7 +22,7 @@ public abstract class Aggregate<TKey, TState> : IAggregate<TKey, TState>
 	 /// <typeparam name="TEvent">The type of the event.</typeparam>
 	 /// <param name="event">The event.</param>
 	 protected internal delegate TState EventHandlerAction<in TEvent>(TEvent @event)
-		 where TEvent : IAggregateEvent<TKey>;
+		 where TEvent : AggregateEvent<TKey>;
 
 	 /// <summary>Gets a value indicating whether this instance has uncommitted events.</summary>
 	 /// <value><c>true</c> if this instance has uncommitted events; otherwise, <c>false</c>.</value>
@@ -35,12 +35,12 @@ public abstract class Aggregate<TKey, TState> : IAggregate<TKey, TState>
 	 public TState State { get; protected set; } = new();
 
 	 /// <inheritdoc />
-	 public IReadOnlyCollection<IAggregateEvent<TKey>> UncommittedEvents => _uncommittedEvents;
+	 public IReadOnlyCollection<AggregateEvent<TKey>> UncommittedEvents => _uncommittedEvents;
 
 	 /// <inheritdoc />
 	 public long Version { get; private set; }
 
-	 internal IReadOnlyDictionary<Type, EventHandlerAction<IAggregateEvent<TKey>>> EventHandlers => _handlers;
+	 internal IReadOnlyDictionary<Type, EventHandlerAction<AggregateEvent<TKey>>> EventHandlers => _handlers;
 
 	 internal static TAggregate Rehydrate<TAggregate>(Snapshot<TKey, TState> snapshot, EventCollection<TKey> eventCollection)
 			 where TAggregate : Aggregate<TKey, TState> {
@@ -63,29 +63,29 @@ public abstract class Aggregate<TKey, TState> : IAggregate<TKey, TState>
 	 /// <summary>Applies the specified event.</summary>
 	 /// <typeparam name="TEvent">The type of event.</typeparam>
 	 /// <param name="event">The event.</param>
-	 protected void Apply<TEvent>(TEvent @event) where TEvent : IAggregateEvent<TKey> {
+	 protected void Apply<TEvent>(TEvent @event) where TEvent : AggregateEvent<TKey> {
 		  Play(@event);
 		  Record(@event);
 	 }
 
 	 /// <summary>Handles the specified handler.</summary>
 	 /// <exception cref="HandlerAlreadyDefinedException"></exception>
-	 protected void Handle<TEvent>(EventHandlerAction<TEvent> handler) where TEvent : IAggregateEvent<TKey> {
+	 protected void Handle<TEvent>(EventHandlerAction<TEvent> handler) where TEvent : AggregateEvent<TKey> {
 		  if(_handlers.ContainsKey(typeof(TEvent)))
 				throw new HandlerAlreadyDefinedException(typeof(TEvent));
 		  _handlers[typeof(TEvent)] = e => handler((TEvent) e);
 	 }
 
-	 private void Play<TEvent>(TEvent @event) where TEvent : IAggregateEvent<TKey> {
+	 private void Play<TEvent>(TEvent @event) where TEvent : AggregateEvent<TKey> {
 		  if(!_handlers.TryGetValue(@event.GetType(), out var eventHandler))
 				throw new HandlerUndefinedException(GetType(), @event.GetType());
 		  var state = eventHandler.Invoke(@event);
 		  SetState(state);
 		  Version++;
-		  @event.Version = Version;
+		  @event.SetVersion(Version);
 	 }
 
-	 private void Record<TEvent>(TEvent @event) where TEvent : IAggregateEvent<TKey> => _uncommittedEvents.Add(@event);
+	 private void Record<TEvent>(TEvent @event) where TEvent : AggregateEvent<TKey> => _uncommittedEvents.Add(@event);
 
 	 /// <summary>Sets the state.</summary>
 	 /// <param name="state">The state.</param>

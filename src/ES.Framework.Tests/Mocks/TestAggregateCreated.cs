@@ -1,13 +1,12 @@
-using ES.Framework.Domain.Events.Design;
+using ES.Framework.Domain.Events;
 
 namespace ES.Framework.Tests.Mocks;
 
-public record TestAggregateCreated : IAggregateEvent<TestAggregateId>
+public record TestAggregateCreated : AggregateEvent<TestAggregateId>
 {
 	 public string Name { get; init; }
 
 	 /// <inheritdoc />
-	 public TestAggregateId Id { get; init; }
-	 /// <inheritdoc />
-	 public long Version { get; set; }
+	 public TestAggregateCreated(TestAggregateId id) : base(id) {
+	 }
 }
