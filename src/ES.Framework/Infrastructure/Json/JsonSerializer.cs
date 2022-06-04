@@ -23,6 +23,9 @@ public static class JsonSerializer
 	 public static TValue Deserialize<TValue>(this string value) =>
 		 System.Text.Json.JsonSerializer.Deserialize<TValue>(value, DefaultSerializerOptions.Value);
 
+	 public static object Deserialize(this string value, Type type) =>
+		 System.Text.Json.JsonSerializer.Deserialize(value, type, DefaultSerializerOptions.Value);
+
 	 public static string Serialize<TValue>(this TValue value) =>
 			  System.Text.Json.JsonSerializer.Serialize(value, DefaultSerializerOptions.Value);
 

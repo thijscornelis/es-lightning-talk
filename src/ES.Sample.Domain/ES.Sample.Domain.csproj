@@ -11,8 +11,4 @@
 	   <ProjectReference Include="..\ES.Framework\ES.Framework.csproj" />
 	 </ItemGroup>
 
-	 <ItemGroup>
-	   <Folder Include="ValueObjects\" />
-	 </ItemGroup>
-
 </Project>

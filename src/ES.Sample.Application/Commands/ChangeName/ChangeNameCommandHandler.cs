@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Application.Commands;
+using ES.Sample.Application.Commands.ChangeName.V1;
 using ES.Sample.Domain.Repositories.Design;
 using Microsoft.Extensions.Logging;
 
@@ -14,5 +15,13 @@ public class ChangeNameCommandHandler : CommandHandlerBase<ChangeNameCommand, Ch
 	 public ChangeNameCommandHandler(ILogger<ChangeNameCommandHandler> logger, IBankAccountRepository repository) : base(logger) => _repository = repository;
 
 	 /// <inheritdoc />
-	 protected override Task<ChangeNameCommandResult> HandleAsync(ChangeNameCommand request, CancellationToken cancellationToken) => throw new NotImplementedException();
+	 protected override async Task<ChangeNameCommandResult> HandleAsync(ChangeNameCommand request, CancellationToken cancellationToken) {
+		  var aggregate = await _repository.GetAsync(request.BankAccountId, cancellationToken);
+		  aggregate.SetName(request.Name);
+		  aggregate = await _repository.SaveAsync(aggregate, cancellationToken);
+
+		  return new() {
+				Name = aggregate.State.Name
+		  };
+	 }
 }

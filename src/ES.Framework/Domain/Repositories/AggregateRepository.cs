@@ -11,7 +11,7 @@ using ES.Framework.Domain.TypedIdentifiers.Design;
 namespace ES.Framework.Domain.Repositories;
 
 /// <inheritdoc />
-public class AggregateRepository<TAggregate, TKey, TState, TValue> : IAggregateRepository<TAggregate, TKey, TState, TValue>
+public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IAggregateRepository<TAggregate, TKey, TState, TValue>
 	where TState : class, IAggregateState<TKey>, new()
 	where TKey : ITypedIdentifier<TValue>
 	where TAggregate : Aggregate<TKey, TState>
@@ -61,7 +61,9 @@ public class AggregateRepository<TAggregate, TKey, TState, TValue> : IAggregateR
 		  if(!aggregate.HasUncommittedEvents)
 				return aggregate;
 
-		  var documents = _eventDocumentConverter.ToEventDocuments(aggregate._uncommittedEvents);
+		  IReadOnlyCollection<EventDocument> documents = new List<EventDocument>();
+
+		  documents = _eventDocumentConverter.ToEventDocuments(aggregate._uncommittedEvents);
 		  await _documentRepository.AddAsync(documents, cancellationToken);
 
 		  aggregate.ClearUncommittedEvents();

@@ -54,8 +54,11 @@ public abstract class Aggregate<TKey, TState> : IAggregate<TKey, TState>
 	 internal void ClearUncommittedEvents() => _uncommittedEvents.Clear();
 
 	 internal void Rehydrate(Snapshot<TKey, TState> snapshot, EventCollection<TKey> eventCollection) {
-		  SetState(snapshot.State);
-		  Version = snapshot.Version;
+		  if(snapshot != null) {
+				SetState(snapshot.State);
+				Version = snapshot.Version;
+		  }
+
 		  foreach(var @event in eventCollection)
 				Play(@event);
 	 }

@@ -5,7 +5,7 @@ using ES.Framework.Domain.Events;
 using ES.Framework.Domain.Events.Design;
 using ES.Framework.Domain.Exceptions;
 using ES.Framework.Domain.TypedIdentifiers.Design;
-using System.Text.Json;
+using ES.Framework.Infrastructure.Json;
 
 namespace ES.Framework.Domain.Documents;
 
@@ -28,10 +28,10 @@ public class EventDocumentConverter<TAggregate, TKey, TState, TValue> : IEventDo
 
 	 /// <inheritdoc />
 	 public AggregateEvent<TKey> ToEvent(EventDocument document) {
-		  var jsonElement = (JsonElement) document.Payload;
+		  var jsonElement = (System.Text.Json.JsonElement) document.Payload;
 		  var json = jsonElement.GetRawText();
 		  var type = Type.GetType(document.EventType) ?? throw new EventTypeNotFoundException($"Type {document.EventType} could not be found in assemblies");
-		  return JsonSerializer.Deserialize(json, type) as AggregateEvent<TKey>;
+		  return json.Deserialize(type) as AggregateEvent<TKey>;
 	 }
 
 	 /// <inheritdoc />
@@ -51,7 +51,7 @@ public class EventDocumentConverter<TAggregate, TKey, TState, TValue> : IEventDo
 		  Payload = @event,
 		  AggregateId = @event.Id.Value,
 		  AggregateType = typeof(TAggregate).FullName,
-		  EventType = @event.GetType().FullName,
+		  EventType = @event.GetType().AssemblyQualifiedName,
 		  AggregateVersion = @event.Version
 	 };
 }

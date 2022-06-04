@@ -7,7 +7,11 @@ public abstract record AggregateEvent<TKey> : IAggregateEvent<TKey>
 {
 	 /// <summary>Initializes a new instance of the <see cref="AggregateEvent{TKey}" /> class.</summary>
 	 /// <param name="id">The identifier.</param>
-	 public AggregateEvent(TKey id) => Id = id;
+	 public AggregateEvent(TKey id) {
+		  Id = id;
+		  EventId = EventId.CreateNew();
+		  OccurredOn = DateTime.UtcNow;
+	 }
 
 	 /// <inheritdoc />
 	 public TKey Id { get; init; }
@@ -16,4 +20,10 @@ public abstract record AggregateEvent<TKey> : IAggregateEvent<TKey>
 	 public long Version { get; private set; }
 
 	 internal void SetVersion(long version) => Version = version;
+
+	 /// <inheritdoc />
+	 public EventId EventId { get; }
+
+	 /// <inheritdoc />
+	 public DateTime OccurredOn { get; }
 }

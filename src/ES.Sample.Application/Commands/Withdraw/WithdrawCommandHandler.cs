@@ -15,5 +15,16 @@ public class WithdrawCommandHandler : CommandHandlerBase<WithdrawCommand, Withdr
 	 public WithdrawCommandHandler(ILogger<CommandHandlerBase<WithdrawCommand, WithdrawCommandResult>> logger, IBankAccountRepository repository) : base(logger) => _repository = repository;
 
 	 /// <inheritdoc />
-	 protected override Task<WithdrawCommandResult> HandleAsync(WithdrawCommand request, CancellationToken cancellationToken) => throw new NotImplementedException();
+	 protected override async Task<WithdrawCommandResult> HandleAsync(WithdrawCommand request, CancellationToken cancellationToken) {
+		  var aggregate = await _repository.GetAsync(request.BankAccountId, cancellationToken);
+		  var @throw = aggregate.Withdraw(request.Amount);
+		  aggregate = await _repository.SaveAsync(aggregate, cancellationToken);
+
+		  if(@throw != null)
+				throw @throw;
+
+		  return new() {
+				Balance = aggregate.State.Balance
+		  };
+	 }
 }
