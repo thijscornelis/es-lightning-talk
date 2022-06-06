@@ -4,14 +4,15 @@ namespace ES.Sample.Fixtures;
 
 public abstract class SerializationFixtureBase<TSource> : FixtureBase
 {
-	 public TSource Source { get; private set; }
+	 /// <summary>Gets the result.</summary>
+	 /// <value>The result.</value>
 	 public string Result { get; private set; }
 
-	 /// <inheritdoc />
-	 protected override Task InternalActAsync() {
-		  Result = Act(Source);
-		  return Task.CompletedTask;
-	 }
+	 /// <summary>Gets the source.</summary>
+	 /// <value>The source.</value>
+	 public TSource Source { get; private set; }
+
+	 protected virtual string Act(TSource source) => source.Serialize();
 
 	 /// <inheritdoc />
 	 protected override void Arrange() {
@@ -20,5 +21,10 @@ public abstract class SerializationFixtureBase<TSource> : FixtureBase
 	 }
 
 	 protected abstract TSource ArrangeSource();
-	 protected virtual string Act(TSource source) => source.Serialize();
+
+	 /// <inheritdoc />
+	 protected override Task InternalActAsync() {
+		  Result = Act(Source);
+		  return Task.CompletedTask;
+	 }
 }

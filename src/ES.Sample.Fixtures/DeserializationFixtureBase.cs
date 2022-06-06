@@ -4,22 +4,27 @@ namespace ES.Sample.Fixtures;
 
 public abstract class DeserializationFixtureBase<TTarget> : FixtureBase
 {
-	public string Source { get; private set; }
-	public TTarget Result { get; private set; }
+	 /// <summary>Gets the result.</summary>
+	 /// <value>The result.</value>
+	 public TTarget Result { get; private set; }
 
-	/// <inheritdoc />
-	protected override void Arrange() {
-		base.Arrange();
-		Source = ArrangeSource();
-	}
+	 /// <summary>Gets the source.</summary>
+	 /// <value>The source.</value>
+	 public string Source { get; private set; }
 
-	protected abstract string ArrangeSource();
+	 protected virtual TTarget Act(string source) => source.Deserialize<TTarget>();
 
-	/// <inheritdoc />
-	protected override Task InternalActAsync() {
-		Result = Act(Source);
-		return Task.CompletedTask;
-	}
+	 /// <inheritdoc />
+	 protected override void Arrange() {
+		  base.Arrange();
+		  Source = ArrangeSource();
+	 }
 
-	protected virtual TTarget Act(string source) => source.Deserialize<TTarget>();
+	 protected abstract string ArrangeSource();
+
+	 /// <inheritdoc />
+	 protected override Task InternalActAsync() {
+		  Result = Act(Source);
+		  return Task.CompletedTask;
+	 }
 }

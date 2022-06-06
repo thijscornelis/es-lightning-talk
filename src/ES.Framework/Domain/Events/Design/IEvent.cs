@@ -1,12 +1,13 @@
 ﻿namespace ES.Framework.Domain.Events.Design;
 
+/// <summary>IEvent</summary>
 public interface IEvent
 {
-	public EventId EventId => EventId.CreateNew();
-	public DateTime OccuredOn => DateTime.UtcNow;
-}
+	 /// <summary>Gets the event identifier.</summary>
+	 /// <value>The event identifier.</value>
+	 public EventId EventId { get; }
 
-public interface IAggregateEvent<TKey> : IEvent
-{
-	public TKey Id { get; init; }
+	 /// <summary>Gets the occurred on.</summary>
+	 /// <value>The occurred on.</value>
+	 public DateTime OccurredOn { get; }
 }

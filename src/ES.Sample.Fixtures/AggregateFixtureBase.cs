@@ -9,22 +9,24 @@ public abstract class AggregateFixtureBase<TAggregate, TKey, TState> : FixtureBa
 	where TKey : ITypedIdentifier
 	where TState : class, IAggregateState<TKey>, new()
 {
-	public TAggregate Aggregate { get; protected set; }
+	 /// <summary>Gets or sets the aggregate.</summary>
+	 /// <value>The aggregate.</value>
+	 public TAggregate Aggregate { get; protected set; }
 
-	/// <inheritdoc />
-	protected override void Arrange() {
-		base.Arrange();
-		Aggregate = ArrangeAggregate();
-		Aggregate?.ClearUncommittedEvents();
-	}
+	 protected abstract void Act();
 
-	/// <inheritdoc />
-	protected override Task InternalActAsync() {
-		Act();
-		return Task.CompletedTask;
-	}
+	 /// <inheritdoc />
+	 protected override void Arrange() {
+		  base.Arrange();
+		  Aggregate = ArrangeAggregate();
+		  Aggregate?.ClearUncommittedEvents();
+	 }
 
-	protected abstract void Act();
+	 protected virtual TAggregate ArrangeAggregate() => Activator.CreateInstance<TAggregate>();
 
-	protected virtual TAggregate ArrangeAggregate() => Activator.CreateInstance<TAggregate>();
+	 /// <inheritdoc />
+	 protected override Task InternalActAsync() {
+		  Act();
+		  return Task.CompletedTask;
+	 }
 }

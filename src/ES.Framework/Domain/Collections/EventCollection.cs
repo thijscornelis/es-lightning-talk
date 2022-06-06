@@ -1,16 +1,16 @@
-﻿using ES.Framework.Domain.Events.Design;
+﻿using ES.Framework.Domain.Events;
 using System.Collections;
 
 namespace ES.Framework.Domain.Collections;
 
 /// <summary>Closed collection which contains IEvent instances</summary>
-public class EventCollection : IReadOnlyCollection<IEvent>
+public class EventCollection<TKey> : IReadOnlyCollection<AggregateEvent<TKey>>
 {
-	 private readonly HashSet<IEvent> _events = new();
+	 private readonly HashSet<AggregateEvent<TKey>> _events = new();
 
-	 /// <summary>Initializes a new instance of the <see cref="EventCollection" /> class.</summary>
+	 /// <summary>Initializes a new instance of the <see cref="EventCollection{TKey}" /> class.</summary>
 	 /// <param name="events">The events.</param>
-	 public EventCollection(params IEvent[] events) {
+	 public EventCollection(params AggregateEvent<TKey>[] events) {
 		  foreach(var @event in events)
 				_events.Add(@event);
 	 }
@@ -27,7 +27,7 @@ public class EventCollection : IReadOnlyCollection<IEvent>
 	 /// <typeparam name="TEvent"></typeparam>
 	 /// <param name="event">The event.</param>
 	 /// <returns>EventCollection.</returns>
-	 public EventCollection Add<TEvent>(TEvent @event) where TEvent : IEvent {
+	 public EventCollection<TKey> Add<TEvent>(TEvent @event) where TEvent : AggregateEvent<TKey> {
 		  _events.Add(@event);
 		  return this;
 	 }
@@ -37,7 +37,7 @@ public class EventCollection : IReadOnlyCollection<IEvent>
 
 	 /// <summary>Gets the enumerator.</summary>
 	 /// <returns>IEnumerator&lt;Event&gt;.</returns>
-	 public IEnumerator<IEvent> GetEnumerator() => _events.GetEnumerator();
+	 public IEnumerator<AggregateEvent<TKey>> GetEnumerator() => _events.GetEnumerator();
 
 	 /// <summary>Returns an enumerator that iterates through a collection.</summary>
 	 /// <returns>An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.</returns>

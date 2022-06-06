@@ -1,4 +1,4 @@
-﻿using ES.Framework.Domain.Repositories;
+﻿using ES.Framework.Domain.Documents;
 using FluentAssertions;
 
 namespace ES.Framework.Tests.Infrastructure.CosmosDb.DocumentRepository;

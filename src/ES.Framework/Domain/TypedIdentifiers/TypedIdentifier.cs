@@ -1,6 +1,5 @@
 ﻿using ES.Framework.Domain.TypedIdentifiers.Converters;
 using ES.Framework.Domain.TypedIdentifiers.Design;
-using ES.Framework.Infrastructure.Json;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -27,9 +26,7 @@ public abstract record TypedIdentifier<TTypedIdentifier> : ITypedIdentifier
 	 /// <inheritdoc />
 	 public override string ToString() => Value;
 
-	 /// <summary>
-	 ///     Compares one <typeparamref name="TTypedIdentifier" /> with another <typeparamref name="TTypedIdentifier" />
-	 /// </summary>
+	 /// <summary>Compares one <typeparamref name="TTypedIdentifier" /> with another <typeparamref name="TTypedIdentifier" /></summary>
 	 /// <param name="other">The other <typeparamref name="TTypedIdentifier" /></param>
 	 /// <returns>Integer with the comparison result</returns>
 	 public int CompareTo(TTypedIdentifier other) => string.Compare(Value, other.Value, StringComparison.OrdinalIgnoreCase);
@@ -72,5 +69,4 @@ public abstract record TypedIdentifier<TTypedIdentifier, TValue> : TypedIdentifi
 		 ? CreateNew<Guid>(Guid.NewGuid())
 		 : CreateNew(Activator.CreateInstance<TValue>())
 	 ;
-	 
 }

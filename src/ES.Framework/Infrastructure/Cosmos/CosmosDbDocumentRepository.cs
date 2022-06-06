@@ -1,4 +1,5 @@
-﻿using ES.Framework.Domain.Repositories;
+﻿using ES.Framework.Domain;
+using ES.Framework.Domain.Documents;
 using ES.Framework.Domain.Repositories.Design;
 using ES.Framework.Infrastructure.Cosmos.Exceptions;
 using Microsoft.Azure.Cosmos;

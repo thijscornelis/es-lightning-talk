@@ -1,4 +1,4 @@
-﻿using ES.Framework.Domain.Repositories;
+﻿using ES.Framework.Domain.Documents;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Moq;
@@ -8,33 +8,33 @@ namespace ES.Framework.Tests.Infrastructure.CosmosDb.DocumentRepository;
 
 public class WhenDeletingDocumentById : IClassFixture<WhenDeletingDocumentById.Fixture>
 {
-	private readonly Fixture _fixture;
+	 private readonly Fixture _fixture;
 
-	public WhenDeletingDocumentById(Fixture fixture) => _fixture = fixture;
+	 public WhenDeletingDocumentById(Fixture fixture) => _fixture = fixture;
 
-	[Fact]
-	public void ItShouldReturnTrue() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
+	 [Fact]
+	 public void ItShouldReturnTrue() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
 
-	[Fact]
-	public void ItShouldSucceed() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
+	 [Fact]
+	 public void ItShouldSucceed() => _fixture.HasExecutedSuccessfully.Should().BeTrue();
 
-	public class Fixture : FixtureBase
-	{
-		public DocumentId DocumentId { get; } = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}"));
-		public string PartitionKey { get; } = "UNIT_TEST_PARTITION_KEY";
+	 public class Fixture : FixtureBase
+	 {
+		  public DocumentId DocumentId { get; } = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}"));
+		  public string PartitionKey { get; } = "UNIT_TEST_PARTITION_KEY";
 
-		public bool Result { get; private set; }
+		  public bool Result { get; private set; }
 
-		/// <inheritdoc />
-		protected override async Task ActAsync(CancellationToken cancellationToken) => Result = await Repository.DeleteAsync<EventDocument>(DocumentId, PartitionKey, CancellationTokenSource.Token);
+		  /// <inheritdoc />
+		  protected override async Task ActAsync(CancellationToken cancellationToken) => Result = await Repository.DeleteAsync<EventDocument>(DocumentId, PartitionKey, CancellationTokenSource.Token);
 
-		/// <inheritdoc />
-		protected override void ArrangeContainer(Mock<Container> mock) => mock.Setup(x => x.DeleteItemAsync<EventDocument>(DocumentId.Value, new(PartitionKey), It.IsAny<ItemRequestOptions>(), CancellationTokenSource.Token)).ReturnsAsync(ArrangeItemResponse);
+		  /// <inheritdoc />
+		  protected override void ArrangeContainer(Mock<Container> mock) => mock.Setup(x => x.DeleteItemAsync<EventDocument>(DocumentId.Value, new(PartitionKey), It.IsAny<ItemRequestOptions>(), CancellationTokenSource.Token)).ReturnsAsync(ArrangeItemResponse);
 
-		private ItemResponse<EventDocument> ArrangeItemResponse() {
-			var mock = new Mock<ItemResponse<EventDocument>>();
-			mock.Setup(x => x.StatusCode).Returns(HttpStatusCode.OK);
-			return mock.Object;
-		}
-	}
+		  private ItemResponse<EventDocument> ArrangeItemResponse() {
+				var mock = new Mock<ItemResponse<EventDocument>>();
+				mock.Setup(x => x.StatusCode).Returns(HttpStatusCode.OK);
+				return mock.Object;
+		  }
+	 }
 }
