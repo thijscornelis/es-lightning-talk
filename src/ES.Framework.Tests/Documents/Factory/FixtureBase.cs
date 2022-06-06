@@ -43,7 +43,7 @@ public class WhenUncommittedEventListContainsSingleItem : IClassFixture<WhenUnco
 		  document.AggregateId.Should().Be(_fixture.Aggregate.Id.Value);
 		  document.Payload.Should().Be(_fixture.Aggregate.UncommittedEvents.Single());
 		  document.AggregateType.Should().Be(typeof(TestAggregate).FullName);
-		  document.EventType.Should().Be(_fixture.Aggregate.UncommittedEvents.Single().GetType().FullName);
+		  document.EventType.Should().Be(_fixture.Aggregate.UncommittedEvents.Single().GetType().AssemblyQualifiedName);
 		  document.AggregateVersion.Should().Be(1);
 		  document.PartitionKey.Should().Be(_fixture.PartitionKey);
 	 }

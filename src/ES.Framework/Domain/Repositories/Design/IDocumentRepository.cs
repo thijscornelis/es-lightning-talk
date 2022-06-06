@@ -50,6 +50,16 @@ public interface IDocumentRepository
 	 IAsyncEnumerable<TDocument> GetAsyncEnumerable<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, CancellationToken cancellationToken = default)
 		 where TDocument : Document;
 
+	 /// <summary>
+	 /// Gets a page of events asynchronously.
+	 /// </summary>
+	 /// <typeparam name="TDocument">The type of document.</typeparam>
+	 /// <param name="partitionKey">The partition key.</param>
+	 /// <param name="whereClause">The where clause.</param>
+	 /// <param name="pageSize">Size of the page.</param>
+	 /// <param name="continuationToken">The continuation token.</param>
+	 /// <param name="cancellationToken">The cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+	 /// <returns>Task&lt;System.ValueTuple&lt;IEnumerable&lt;TDocument&gt;, ContinuationToken&gt;&gt;.</returns>
 	 Task<(IEnumerable<TDocument>, ContinuationToken)> GetPageAsync<TDocument>(string partitionKey, Expression<Func<TDocument, bool>> whereClause = null, int pageSize = 50, ContinuationToken continuationToken = null, CancellationToken cancellationToken = default)
 			  where TDocument : Document;
 }

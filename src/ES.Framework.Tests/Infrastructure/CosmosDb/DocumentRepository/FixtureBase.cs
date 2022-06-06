@@ -6,6 +6,7 @@ namespace ES.Framework.Tests.Infrastructure.CosmosDb.DocumentRepository;
 
 public abstract class FixtureBase : DocumentRepositoryFixtureBase
 {
-	 /// <inheritdoc />
-	 protected override IDocumentRepository CreateRepository() => new CosmosDocumentRepository(ContainerMock.Object);
+	/// <inheritdoc />
+	protected override IDocumentRepository CreateRepository() =>
+		new CosmosDocumentRepository(ContainerMock.Object, QueryMock.Object);
 }

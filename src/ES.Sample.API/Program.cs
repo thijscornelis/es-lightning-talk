@@ -100,6 +100,7 @@ async Task EnsureDatabaseAvailability(WebApplication webApplication) {
 }
 
 void RegisterRepositories(WebApplicationBuilder webApplicationBuilder) {
+	 webApplicationBuilder.Services.AddTransient<ICosmosQuery, CosmosQuery>();
 	 webApplicationBuilder.Services.AddSingleton(c => new CosmosClient("https://localhost:8081",
 		 "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
 		 new CosmosClientOptions {
@@ -115,7 +116,7 @@ void RegisterRepositories(WebApplicationBuilder webApplicationBuilder) {
 	 webApplicationBuilder.Services.AddScoped<IBankAccountRepository, BankAccountRepository>(c => {
 		  var database = c.GetService<Database>() ?? throw new ArgumentNullException(nameof(Database), "Could not be resolved by the IOC");
 		  var container = database.GetContainer("events");
-		  return new BankAccountRepository(new CosmosDocumentRepository(container),
+		  return new BankAccountRepository(new CosmosDocumentRepository(container, c.GetService<ICosmosQuery>()),
 			  c.GetService<IEventDocumentConverter<BankAccount, BankAccountId, BankAccountState, Guid>>(),
 			  c.GetService<IPartitionKeyResolver<BankAccount, BankAccountId, BankAccountState, Guid>>());
 	 });

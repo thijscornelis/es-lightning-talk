@@ -13,11 +13,18 @@ namespace ES.Framework.Infrastructure.Cosmos;
 /// <inheritdoc />
 public class CosmosDocumentRepository : IDocumentRepository
 {
+	private readonly ICosmosQuery _queryExtensions;
 	 private readonly Container _container;
 
-	 /// <summary>Initializes a new instance of the <see cref="CosmosDocumentRepository" /> class.</summary>
+	 /// <summary>
+	 /// Initializes a new instance of the <see cref="CosmosDocumentRepository" /> class.
+	 /// </summary>
 	 /// <param name="container">The container.</param>
-	 public CosmosDocumentRepository(Container container) => _container = container;
+	 /// <param name="queryExtensions">The query extensions.</param>
+	 public CosmosDocumentRepository(Container container, ICosmosQuery queryExtensions) {
+		 _container = container;
+		 _queryExtensions = queryExtensions;
+	 }
 
 	 /// <inheritdoc />
 	 public async Task<bool> AddAsync<TDocument>(IReadOnlyCollection<TDocument> documents, CancellationToken cancellationToken)
@@ -114,8 +121,33 @@ public class CosmosDocumentRepository : IDocumentRepository
 					linqSerializerOptions: new CosmosLinqSerializerOptions() {
 						 PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
 					});
-		  return whereClause is not null
-			  ? queryable.Where(whereClause).ToFeedIterator()
-			  : queryable.ToFeedIterator();
+
+		  var query = whereClause is not null
+			  ? queryable.Where(whereClause)
+			  : queryable;
+
+		  return _queryExtensions.GetFeedIterator(queryable);
 	 }
+}
+
+
+/// <summary>
+/// Wrap ToFeedIterator extension method for testing purposes
+/// </summary>
+public interface ICosmosQuery
+{
+	 /// <summary>
+	 /// Gets the feed iterator.
+	 /// </summary>
+	 /// <typeparam name="T"></typeparam>
+	 /// <param name="query">The query.</param>
+	 /// <returns>FeedIterator&lt;T&gt;.</returns>
+	 public FeedIterator<T> GetFeedIterator<T>(IQueryable<T> query);
+}
+
+/// <inheritdoc />
+public class CosmosQuery : ICosmosQuery
+{
+	/// <inheritdoc />
+	public FeedIterator<T> GetFeedIterator<T>(IQueryable<T> query) => query.ToFeedIterator();
 }
