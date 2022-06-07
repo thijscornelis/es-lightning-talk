@@ -30,7 +30,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(CreateCommand).Assembly);
 builder.Services.AddTransient<IDateTimeProvider, UniversalDateTimeProvider>();
 builder.Services.AddTransient<IAttributeValueResolver, AttributeValueResolver>();
-
+builder.Services.AddSingleton(typeof(IHostedService), (c) => {
+	var db = c.GetRequiredService<Database>();
+	var service = new CosmosChangeFeedProcessor(db.GetContainer("leases"), db.GetContainer("events"),
+		c.GetService<ILogger<CosmosChangeFeedProcessor>>());
+	return service;
+});
 builder.Services.AddTransient(typeof(IPartitionKeyResolver<,,,>), typeof(PartitionKeyResolver<,,,>));
 builder.Services.AddTransient(typeof(IEventDocumentConverter<,,,>), typeof(EventDocumentConverter<,,,>));
 
@@ -81,19 +86,19 @@ async Task EnsureDatabaseAvailability(WebApplication webApplication) {
 
 				await Task.WhenAll(db.CreateContainerIfNotExistsAsync(
 					"events",
-					"/_partitionKey",
+					"/partitionKey",
 					cancellationToken: cancellationTokenSource.Token), db.CreateContainerIfNotExistsAsync(
 					"snapshots",
-					"/_partitionKey",
+					"/partitionKey",
 					cancellationToken: cancellationTokenSource.Token), db.CreateContainerIfNotExistsAsync(
 					"leases",
-					"/_partitionKey",
+					"/partitionKey",
 					cancellationToken: cancellationTokenSource.Token), db.CreateContainerIfNotExistsAsync(
 					"checkpoints",
-					"/_partitionKey",
+					"/partitionKey",
 					cancellationToken: cancellationTokenSource.Token), db.CreateContainerIfNotExistsAsync(
 					"projections",
-					"/_partitionKey",
+					"/partitionKey",
 					cancellationToken: cancellationTokenSource.Token));
 		  }
 	 }

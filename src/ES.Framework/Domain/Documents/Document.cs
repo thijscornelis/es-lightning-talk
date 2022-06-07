@@ -27,6 +27,6 @@ public abstract record Document
 
 	 /// <summary>Gets the partition key.</summary>
 	 /// <value>The partition key.</value>
-	 [JsonPropertyName("_partitionKey")]
+	 [JsonPropertyName("partitionKey")]
 	 public string PartitionKey { get; init; }
 }

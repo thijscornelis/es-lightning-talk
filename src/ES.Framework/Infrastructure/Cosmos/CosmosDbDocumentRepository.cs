@@ -13,7 +13,7 @@ namespace ES.Framework.Infrastructure.Cosmos;
 /// <inheritdoc />
 public class CosmosDocumentRepository : IDocumentRepository
 {
-	private readonly ICosmosQuery _queryExtensions;
+	 private readonly ICosmosQuery _queryExtensions;
 	 private readonly Container _container;
 
 	 /// <summary>
@@ -22,8 +22,8 @@ public class CosmosDocumentRepository : IDocumentRepository
 	 /// <param name="container">The container.</param>
 	 /// <param name="queryExtensions">The query extensions.</param>
 	 public CosmosDocumentRepository(Container container, ICosmosQuery queryExtensions) {
-		 _container = container;
-		 _queryExtensions = queryExtensions;
+		  _container = container;
+		  _queryExtensions = queryExtensions;
 	 }
 
 	 /// <inheritdoc />
@@ -148,6 +148,6 @@ public interface ICosmosQuery
 /// <inheritdoc />
 public class CosmosQuery : ICosmosQuery
 {
-	/// <inheritdoc />
-	public FeedIterator<T> GetFeedIterator<T>(IQueryable<T> query) => query.ToFeedIterator();
+	 /// <inheritdoc />
+	 public FeedIterator<T> GetFeedIterator<T>(IQueryable<T> query) => query.ToFeedIterator();
 }
