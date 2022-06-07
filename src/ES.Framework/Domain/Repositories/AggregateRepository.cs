@@ -17,14 +17,14 @@ public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IA
 	where TAggregate : Aggregate<TKey, TState>
 {
 	 private readonly IDocumentRepository _documentRepository;
-	 private readonly IEventDocumentConverter<TAggregate, TKey, TState, TValue> _eventDocumentConverter;
-	 private readonly IPartitionKeyResolver<TAggregate, TKey, TState, TValue> _partitionKeyResolver;
+	 private readonly IEventDocumentConverter _eventDocumentConverter;
+	 private readonly IPartitionKeyResolver _partitionKeyResolver;
 
 	 /// <summary>Initializes a new instance of the <see cref="AggregateRepository{TAggregate, TKey, TState, TValue}" /> class.</summary>
 	 /// <param name="documentRepository">The document repository.</param>
 	 /// <param name="eventDocumentConverter">The event document converter.</param>
 	 /// <param name="partitionKeyResolver">The partition key resolver.</param>
-	 public AggregateRepository(IDocumentRepository documentRepository, IEventDocumentConverter<TAggregate, TKey, TState, TValue> eventDocumentConverter, IPartitionKeyResolver<TAggregate, TKey, TState, TValue> partitionKeyResolver) {
+	 public AggregateRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IPartitionKeyResolver partitionKeyResolver) {
 		  _documentRepository = documentRepository;
 		  _eventDocumentConverter = eventDocumentConverter;
 		  _partitionKeyResolver = partitionKeyResolver;
@@ -32,12 +32,12 @@ public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IA
 
 	 /// <inheritdoc />
 	 public async Task<TAggregate> FindAsync(TKey id, CancellationToken cancellationToken) {
-		  var partitionKey = _partitionKeyResolver.CreateSyntheticPartitionKey(id);
+		  var partitionKey = _partitionKeyResolver.CreateSyntheticPartitionKey<TAggregate, TKey, TState, TValue>(id);
 		  var enumerable = _documentRepository.GetAsyncEnumerable<EventDocument>(partitionKey, cancellationToken: cancellationToken);
 
 		  var events = new EventCollection<TKey>();
 		  await foreach(var document in enumerable.WithCancellation(cancellationToken)) {
-				events.Add(_eventDocumentConverter.ToEvent(document));
+				events.Add(_eventDocumentConverter.ToAggregateEvent<TKey, TValue>(document));
 		  }
 
 		  if(!events.Any())
@@ -61,9 +61,8 @@ public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IA
 		  if(!aggregate.HasUncommittedEvents)
 				return aggregate;
 
-		  IReadOnlyCollection<EventDocument> documents = new List<EventDocument>();
 
-		  documents = _eventDocumentConverter.ToEventDocuments(aggregate._uncommittedEvents);
+		  var documents = _eventDocumentConverter.ToEventDocuments<TAggregate, TKey, TState, TValue>(aggregate._uncommittedEvents);
 		  await _documentRepository.AddAsync(documents, cancellationToken);
 
 		  aggregate.ClearUncommittedEvents();

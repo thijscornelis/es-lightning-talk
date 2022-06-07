@@ -18,7 +18,7 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 
 	 /// <summary>Gets the converter.</summary>
 	 /// <value>The converter.</value>
-	 public IEventDocumentConverter<TAggregate, TKey, TState, TValue> Converter { get; private set; }
+	 public IEventDocumentConverter Converter { get; private set; }
 
 	 /// <summary>Gets the date time provider mock.</summary>
 	 /// <value>The date time provider mock.</value>
@@ -26,14 +26,14 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 
 	 /// <summary>Gets the partition key resolver mock.</summary>
 	 /// <value>The partition key resolver mock.</value>
-	 public Mock<IPartitionKeyResolver<TAggregate, TKey, TState, TValue>> PartitionKeyResolverMock { get; } =
+	 public Mock<IPartitionKeyResolver> PartitionKeyResolverMock { get; } =
 		 new() { CallBase = true };
 
 	 /// <summary>Gets the result.</summary>
 	 /// <value>The result.</value>
 	 public IReadOnlyCollection<EventDocument> Result { get; private set; }
 
-	 protected virtual void Act() => Result = Converter.ToEventDocuments(Aggregate.UncommittedEvents);
+	 protected virtual void Act() => Result = Converter.ToEventDocuments<TAggregate, TKey, TState, TValue>(Aggregate.UncommittedEvents);
 
 	 /// <inheritdoc />
 	 protected override void Arrange() {
@@ -49,7 +49,7 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 	 protected virtual void ArrangeDateTimeProvider(Mock<IDateTimeProvider> mock) {
 	 }
 
-	 protected virtual void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver<TAggregate, TKey, TState, TValue>> mock) {
+	 protected virtual void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver> mock) {
 	 }
 
 	 /// <inheritdoc />
@@ -58,5 +58,5 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 		  return Task.CompletedTask;
 	 }
 
-	 private IEventDocumentConverter<TAggregate, TKey, TState, TValue> ArrangeFactory() => new EventDocumentConverter<TAggregate, TKey, TState, TValue>(DateTimeProviderMock.Object, PartitionKeyResolverMock.Object);
+	 private IEventDocumentConverter ArrangeFactory() => new EventDocumentConverter(DateTimeProviderMock.Object, PartitionKeyResolverMock.Object);
 }

@@ -59,6 +59,6 @@ public class WhenUncommittedEventListContainsSingleItem : IClassFixture<WhenUnco
 		  protected override TestAggregate ArrangeAggregate() => new(TestAggregateId.CreateNew(Guid.Parse("{4C4152E5-718A-46B2-97E9-FADA42F2D53C}")), "UNIT TEST NAME");
 
 		  /// <inheritdoc />
-		  protected override void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver<TestAggregate, TestAggregateId, TestAggregateState, Guid>> mock) => mock.Setup(x => x.CreateSyntheticPartitionKey(Aggregate.Id)).Returns(PartitionKey);
+		  protected override void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver> mock) => mock.Setup(x => x.CreateSyntheticPartitionKey<TestAggregate, TestAggregateId, TestAggregateState, Guid>(Aggregate.Id)).Returns(PartitionKey);
 	 }
 }

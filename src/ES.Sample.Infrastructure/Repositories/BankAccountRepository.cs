@@ -5,12 +5,12 @@ using ES.Framework.Domain.Repositories.Design;
 using ES.Sample.Domain.Aggregates;
 using ES.Sample.Domain.Repositories.Design;
 
-namespace ES.Sample.Infrastructure;
+namespace ES.Sample.Infrastructure.Repositories;
 
 /// <inheritdoc cref="IBankAccountRepository" />
 public class BankAccountRepository : AggregateRepository<BankAccount, BankAccountId, BankAccountState, Guid>, IBankAccountRepository
 {
 	 /// <inheritdoc />
-	 public BankAccountRepository(IDocumentRepository documentRepository, IEventDocumentConverter<BankAccount, BankAccountId, BankAccountState, Guid> eventDocumentConverter, IPartitionKeyResolver<BankAccount, BankAccountId, BankAccountState, Guid> partitionKeyResolver) : base(documentRepository, eventDocumentConverter, partitionKeyResolver) {
+	 public BankAccountRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IPartitionKeyResolver partitionKeyResolver) : base(documentRepository, eventDocumentConverter, partitionKeyResolver) {
 	 }
 }
