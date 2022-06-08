@@ -30,10 +30,12 @@ public partial class BankAccount : Aggregate<BankAccountId, BankAccountState>
 	 /// <param name="amount">The amount.</param>
 	 /// <exception cref="ES.Sample.Domain.Exceptions.NegativeAmountException"></exception>
 	 /// <exception cref="ES.Sample.Domain.Exceptions.InvalidAmountException"></exception>
-	 public void Deposit(decimal amount) {
+	 public void Deposit(decimal amount, string description) {
 		  ThrowIfNegativeAmount(amount);
 		  ThrowIfInvalidAmount(amount);
 		  Apply(new MoneyDeposited(Id) {
+				StatementId = StatementId.CreateNew(),
+				Description = description,
 				Amount = amount
 		  });
 	 }
@@ -50,9 +52,11 @@ public partial class BankAccount : Aggregate<BankAccountId, BankAccountState>
 
 	 /// <summary>Withdraws the specified amount.</summary>
 	 /// <param name="amount">The amount.</param>
+	 /// <param name="description">The description.</param>
+	 /// <returns>System.Exception.</returns>
 	 /// <exception cref="ES.Sample.Domain.Exceptions.NegativeAmountException"></exception>
 	 /// <exception cref="ES.Sample.Domain.Exceptions.InvalidAmountException"></exception>
-	 public Exception Withdraw(decimal amount) {
+	 public Exception Withdraw(decimal amount, string description) {
 		  ThrowIfNegativeAmount(amount);
 		  ThrowIfInvalidAmount(amount);
 
@@ -73,7 +77,9 @@ public partial class BankAccount : Aggregate<BankAccountId, BankAccountState>
 		  }
 
 		  Apply(new MoneyWithdrawn(Id) {
-				Amount = amount
+				Amount = amount,
+				StatementId = StatementId.CreateNew(),
+				Description = description,
 		  });
 		  return null;
 	 }

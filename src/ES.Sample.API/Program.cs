@@ -24,7 +24,9 @@ using ES.Sample.Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using System.Diagnostics;
 using System.Net;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,24 +76,46 @@ if(app.Environment.IsDevelopment()) {
 app.UseHttpsRedirection();
 app.MapGet("api/bank-accounts/{id}/statements",
 	([FromRoute] Guid id, IProjectionRepository repository) => {
-		 var bankAccountId = BankAccountId.CreateNew(id);
-		 var queryable = repository.Get<BankStatementProjection>(x => x.BankAccountId == bankAccountId);
+		 var result = new Result<BankStatementProjection[]>();
+		 var stopwatch = new Stopwatch();
+		 try {
+			  stopwatch.Start();
 
-		 var projections = queryable.ToList();
-		 return !projections.Any()
-			 ? Results.NoContent()
-			 : Results.Json(projections, statusCode: (int) HttpStatusCode.OK, options: JsonSerializer.DefaultSerializerOptions.Value);
+			  var bankAccountId = BankAccountId.CreateNew(id);
+			  var queryable = repository.Get<BankStatementProjection>(x => x.BankAccountId == bankAccountId);
+			  result.SetResult(queryable.ToArray());
+		 }
+		 catch(Exception e) {
+			  result.SetException(e);
+		 }
+		 finally {
+			  stopwatch.Stop();
+			  result.SetElapsedTime(stopwatch.Elapsed);
+		 }
+
+		 return result.ToHttpResult();
 	});
 
 app.MapGet("api/bank-accounts/{id}",
 	([FromRoute] Guid id, IProjectionRepository repository) => {
-		 var bankAccountId = BankAccountId.CreateNew(id);
-		 var queryable = repository.Get<BankAccountProjection>(x => x.BankAccountId == bankAccountId);
-		 var items = queryable.ToList();
-		 var projection = queryable.AsEnumerable().SingleOrDefault();
-		 return projection == null
-			 ? Results.NotFound()
-			 : Results.Json(projection, statusCode: (int) HttpStatusCode.OK, options: JsonSerializer.DefaultSerializerOptions.Value);
+		 var result = new Result<BankAccountProjection>();
+		 var stopwatch = new Stopwatch();
+		 try {
+			  stopwatch.Start();
+
+			  var bankAccountId = BankAccountId.CreateNew(id);
+			  var queryable = repository.Get<BankAccountProjection>(x => x.BankAccountId == bankAccountId);
+			  result.SetResult(queryable.AsEnumerable().SingleOrDefault());
+		 }
+		 catch(Exception e) {
+			  result.SetException(e);
+		 }
+		 finally {
+			  stopwatch.Stop();
+			  result.SetElapsedTime(stopwatch.Elapsed);
+		 }
+
+		 return result.ToHttpResult();
 	});
 
 app.MapPost("api/bank-accounts",
@@ -179,6 +203,34 @@ void RegisterRepositories(WebApplicationBuilder webApplicationBuilder) {
 	 });
 }
 
+public record Result<T>
+{
+	 /// <summary>Gets the query result.</summary>
+	 /// <value>The query result.</value>
+	 public T QueryResult { get; private set; }
+
+	 /// <summary>Gets the elapsed time.</summary>
+	 /// <value>The elapsed time.</value>
+	 public TimeSpan ElapsedTime { get; private set; }
+
+	 /// <summary>Gets the exception.</summary>
+	 /// <value>The exception.</value>
+	 [JsonIgnore]
+	 public Exception Exception { get; private set; }
+
+	 /// <summary>Gets the exception message.</summary>
+	 /// <value>The exception message.</value>
+	 public string ExceptionMessage => Exception?.GetBaseException().Message;
+
+	 /// <summary>Gets a value indicating whether this instance has executed successfully.</summary>
+	 /// <value><c>true</c> if this instance has executed successfully; otherwise, <c>false</c>.</value>
+	 public bool HasExecutedSuccessfully => Exception == null && ElapsedTime != TimeSpan.Zero;
+
+	 internal void SetResult(T result) => QueryResult = result;
+	 internal void SetException(Exception exception) => Exception = exception;
+	 internal void SetElapsedTime(TimeSpan elapsedTime) => ElapsedTime = elapsedTime;
+}
+
 /// <summary>Class CommandResultExtensions.</summary>
 public static class CommandResultExtensions
 {
@@ -186,6 +238,37 @@ public static class CommandResultExtensions
 	 /// <param name="result">The result.</param>
 	 /// <returns>Microsoft.AspNetCore.Http.IResult.</returns>
 	 public static IResult ToHttpResult(this CommandResult result) {
+		  if(result == null)
+				return Results.StatusCode((int) HttpStatusCode.InternalServerError);
+
+		  if(result.HasExecutedSuccessfully)
+				return Results.Json(result, statusCode: (int) HttpStatusCode.OK,
+					options: JsonSerializer.DefaultSerializerOptions.Value);
+
+		  return result.Exception switch {
+				AggregateNotFoundException e => Results.NotFound(),
+				ValidationException e => Results.BadRequest(new ProblemDetails {
+					 Status = (int) HttpStatusCode.BadRequest,
+					 Detail = e.GetBaseException().Message,
+					 Title = "PEBCAK"
+				}),
+				ApplicationException e => Results.BadRequest(new ProblemDetails {
+					 Status = (int) HttpStatusCode.BadRequest,
+					 Detail = e.GetBaseException().Message,
+					 Title = e.GetBaseException().GetType().Name
+				}),
+				_ => Results.StatusCode((int) HttpStatusCode.InternalServerError)
+		  };
+	 }
+}
+
+/// <summary>Class CommandResultExtensions.</summary>
+public static class QueryResultExtensions
+{
+	 /// <summary>Converts to <see cref="CommandResult" /> to a valid <see cref="HttpStatusCode" />.</summary>
+	 /// <param name="result">The result.</param>
+	 /// <returns>Microsoft.AspNetCore.Http.IResult.</returns>
+	 public static IResult ToHttpResult<T>(this Result<T> result) {
 		  if(result == null)
 				return Results.StatusCode((int) HttpStatusCode.InternalServerError);
 

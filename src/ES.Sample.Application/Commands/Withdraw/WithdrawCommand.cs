@@ -14,6 +14,10 @@ namespace ES.Sample.Application.Commands.Withdraw
 				/// <summary>Gets the amount.</summary>
 				/// <value>The amount.</value>
 				public decimal Amount { get; init; }
+
+				/// <summary>Gets the description.</summary>
+				/// <value>The description.</value>
+				public string Description { get; init; }
 		  }
 	 }
 }

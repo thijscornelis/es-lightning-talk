@@ -17,7 +17,7 @@ public class DepositCommandHandler : CommandHandlerBase<DepositCommand, DepositC
 	 /// <inheritdoc />
 	 protected override async Task<DepositCommandResult> HandleAsync(DepositCommand request, CancellationToken cancellationToken) {
 		  var aggregate = await _repository.GetAsync(request.BankAccountId, cancellationToken);
-		  aggregate.Deposit(request.Amount);
+		  aggregate.Deposit(request.Amount, request.Description);
 		  aggregate = await _repository.SaveAsync(aggregate, cancellationToken);
 
 		  return new() {

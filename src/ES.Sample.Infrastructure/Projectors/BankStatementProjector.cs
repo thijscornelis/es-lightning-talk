@@ -10,13 +10,13 @@ public class BankStatementProjector : Projector<BankStatementProjection>
 {
 	 /// <inheritdoc />
 	 public BankStatementProjector(IProjectionRepository repository) : base(repository) {
-		  Handle<MoneyWithdrawn>(OnWithdraw, e => BankStatementProjection.GetProjectionId(e.Id));
-		  Handle<MoneyDeposited>(OnDeposit, e => BankStatementProjection.GetProjectionId(e.Id));
+		  Handle<MoneyWithdrawn>(OnWithdraw, e => BankStatementProjection.GetProjectionId(e.StatementId));
+		  Handle<MoneyDeposited>(OnDeposit, e => BankStatementProjection.GetProjectionId(e.StatementId));
 	 }
 
 	 private BankStatementProjection OnDeposit(MoneyDeposited @event, BankStatementProjection projection) =>
-		  projection with { Amount = @event.Amount, On = @event.OccurredOn, BankAccountId = @event.Id };
+		  projection with { Amount = @event.Amount, On = @event.OccurredOn, BankAccountId = @event.Id, StatementId = @event.StatementId, Description = @event.Description };
 
 	 private BankStatementProjection OnWithdraw(MoneyWithdrawn @event, BankStatementProjection projection) =>
-		 projection with { Amount = @event.Amount * -1, On = @event.OccurredOn, BankAccountId = @event.Id };
+		 projection with { Amount = @event.Amount * -1, On = @event.OccurredOn, BankAccountId = @event.Id, StatementId = @event.StatementId, Description = @event.Description };
 }

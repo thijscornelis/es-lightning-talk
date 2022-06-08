@@ -17,7 +17,7 @@ public class WithdrawCommandHandler : CommandHandlerBase<WithdrawCommand, Withdr
 	 /// <inheritdoc />
 	 protected override async Task<WithdrawCommandResult> HandleAsync(WithdrawCommand request, CancellationToken cancellationToken) {
 		  var aggregate = await _repository.GetAsync(request.BankAccountId, cancellationToken);
-		  var @throw = aggregate.Withdraw(request.Amount);
+		  var @throw = aggregate.Withdraw(request.Amount, request.Description);
 		  aggregate = await _repository.SaveAsync(aggregate, cancellationToken);
 
 		  if(@throw != null)
