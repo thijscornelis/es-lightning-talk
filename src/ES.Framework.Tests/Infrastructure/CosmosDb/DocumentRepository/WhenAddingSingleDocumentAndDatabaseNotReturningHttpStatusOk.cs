@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Domain.Documents;
+using ES.Framework.Domain.Events;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Moq;
@@ -21,7 +22,7 @@ public class WhenAddingSingleDocumentAndDatabaseNotReturningHttpStatusOk : IClas
 	 public class Fixture : FixtureBase
 	 {
 		  public EventDocument EventDocument { get; } = new() {
-				Id = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
+				Id = EventId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
 				PartitionKey = "UNIT_TEST_PARTITION_KEY",
 				AggregateVersion = 1,
 				Timestamp = DateTime.UtcNow

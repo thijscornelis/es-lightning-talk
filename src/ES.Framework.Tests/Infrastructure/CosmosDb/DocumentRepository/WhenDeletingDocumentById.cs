@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Domain.Documents;
+using ES.Framework.Domain.Events;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Moq;
@@ -20,13 +21,13 @@ public class WhenDeletingDocumentById : IClassFixture<WhenDeletingDocumentById.F
 
 	 public class Fixture : FixtureBase
 	 {
-		  public DocumentId DocumentId { get; } = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}"));
+		  public EventId DocumentId { get; } = EventId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}"));
 		  public string PartitionKey { get; } = "UNIT_TEST_PARTITION_KEY";
 
 		  public bool Result { get; private set; }
 
 		  /// <inheritdoc />
-		  protected override async Task ActAsync(CancellationToken cancellationToken) => Result = await Repository.DeleteAsync<EventDocument>(DocumentId, PartitionKey, CancellationTokenSource.Token);
+		  protected override async Task ActAsync(CancellationToken cancellationToken) => Result = await Repository.DeleteAsync<EventDocument, EventId>(DocumentId, PartitionKey, CancellationTokenSource.Token);
 
 		  /// <inheritdoc />
 		  protected override void ArrangeContainer(Mock<Container> mock) => mock.Setup(x => x.DeleteItemAsync<EventDocument>(DocumentId.Value, new(PartitionKey), It.IsAny<ItemRequestOptions>(), CancellationTokenSource.Token)).ReturnsAsync(ArrangeItemResponse);

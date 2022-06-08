@@ -11,6 +11,6 @@ namespace ES.Sample.Infrastructure.Repositories;
 public class BankAccountRepository : AggregateRepository<BankAccount, BankAccountId, BankAccountState, Guid>, IBankAccountRepository
 {
 	 /// <inheritdoc />
-	 public BankAccountRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IPartitionKeyResolver partitionKeyResolver) : base(documentRepository, eventDocumentConverter, partitionKeyResolver) {
+	 public BankAccountRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IAggregatePartitionKeyResolver aggregatePartitionKeyResolver) : base(documentRepository, eventDocumentConverter, aggregatePartitionKeyResolver) {
 	 }
 }

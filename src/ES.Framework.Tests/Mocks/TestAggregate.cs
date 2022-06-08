@@ -3,18 +3,18 @@ using ES.Framework.Domain.Aggregates.Attributes;
 
 namespace ES.Framework.Tests.Mocks;
 
-[AggregatePartitionKey("{0}-{1}-{2}")]
+[PartitionKey("{0}-{1}-{2}")]
 public class TypeWithAggregatePartitionKeyAttribute
 { }
 
-[AggregatePartitionKey("{3}-{1}-{2}")]
+[PartitionKey("{3}-{1}-{2}")]
 public class TypeWithAggregatePartitionKeyAttributeWithCustomFormat
 { }
 
 public class TypeWithoutAttribute
 { }
 
-[AggregatePartitionKey("{0}-{1:N}")]
+[PartitionKey("{0}-{1:N}")]
 public class TestAggregate : Aggregate<TestAggregateId, TestAggregateState>
 {
 	 public TestAggregate(string name) : this(TestAggregateId.CreateNew(), name) {

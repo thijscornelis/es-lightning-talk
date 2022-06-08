@@ -1,10 +1,11 @@
 ﻿using ES.Framework.Domain.Events;
+using ES.Framework.Domain.TypedIdentifiers.Design;
 using System.Collections;
 
 namespace ES.Framework.Domain.Collections;
 
 /// <summary>Closed collection which contains IEvent instances</summary>
-public class EventCollection<TKey> : IReadOnlyCollection<AggregateEvent<TKey>>
+public class EventCollection<TKey> : IReadOnlyCollection<AggregateEvent<TKey>> where TKey : ITypedIdentifier
 {
 	 private readonly HashSet<AggregateEvent<TKey>> _events = new();
 

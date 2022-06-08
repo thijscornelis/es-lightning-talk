@@ -1,4 +1,5 @@
-﻿using ES.Framework.Domain.Documents;
+﻿using ES.Framework.Domain;
+using ES.Framework.Domain.Documents;
 using ES.Framework.Domain.Events;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
@@ -6,18 +7,18 @@ using Moq;
 
 namespace ES.Framework.Tests.Infrastructure.CosmosDb.DocumentRepository;
 
-public class WhenGettingAsyncEnumerable : IClassFixture<WhenGettingAsyncEnumerable.Fixture>
+public class WhenGettingPage : IClassFixture<WhenGettingPage.Fixture>
 {
 	 private readonly Fixture _fixture;
 
-	 public WhenGettingAsyncEnumerable(Fixture fixture) => _fixture = fixture;
+	 public WhenGettingPage(Fixture fixture) => _fixture = fixture;
 
 	 [Fact]
-	 public async Task ItShouldReturnAsyncEnumerable() {
+	 public void ItShouldReturnEnumerable() {
 		  _fixture.Result.Should().NotBeNull();
 
 		  var documents = new List<EventDocument>();
-		  await foreach(var item in _fixture.Result) {
+		  foreach(var item in _fixture.Result) {
 				documents.Add(item);
 		  }
 
@@ -29,6 +30,9 @@ public class WhenGettingAsyncEnumerable : IClassFixture<WhenGettingAsyncEnumerab
 
 	 public class Fixture : FixtureBase
 	 {
+		  public ContinuationToken ContinuationToken { get; private set; } =
+			  new ContinuationToken("UNIT_TEST_CONTINUATION_TOKEN");
+
 		  public List<EventDocument> EventDocuments { get; } = new() {
 			new() {
 				Id = EventId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
@@ -52,17 +56,17 @@ public class WhenGettingAsyncEnumerable : IClassFixture<WhenGettingAsyncEnumerab
 		};
 
 		  public string PartitionKey { get; set; } = "UNIT_TEST_PARTITION_KEY";
-		  public IAsyncEnumerable<EventDocument> Result { get; private set; }
+		  public IEnumerable<EventDocument> Result { get; private set; }
 
 		  /// <inheritdoc />
-		  protected override Task ActAsync(CancellationToken cancellationToken) {
-				Result = Repository.GetAsyncEnumerable<EventDocument>(PartitionKey, null, CancellationTokenSource.Token);
-				return Task.CompletedTask;
+		  protected override async Task ActAsync(CancellationToken cancellationToken) {
+				var pagedResult = await Repository.GetPageAsync<EventDocument>(PartitionKey, null, continuationToken: ContinuationToken, cancellationToken: CancellationTokenSource.Token);
+				Result = pagedResult.Item1;
 		  }
 
 		  /// <inheritdoc />
 		  protected override void ArrangeContainer(Mock<Container> mock)
-			  => mock.Setup(x => x.GetItemLinqQueryable<EventDocument>(false, It.IsAny<string>(), It.IsAny<QueryRequestOptions>(), It.IsAny<CosmosLinqSerializerOptions>()))
+			  => mock.Setup(x => x.GetItemLinqQueryable<EventDocument>(false, ContinuationToken.Value, It.IsAny<QueryRequestOptions>(), It.IsAny<CosmosLinqSerializerOptions>()))
 				  .Returns(new EnumerableQuery<EventDocument>(EventDocuments));
 	 }
 }

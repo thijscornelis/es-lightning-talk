@@ -1,4 +1,5 @@
 ﻿using ES.Framework.Domain.Documents;
+using ES.Framework.Domain.Events;
 using FluentAssertions;
 
 namespace ES.Framework.Tests.Infrastructure.CosmosDb.DocumentRepository;
@@ -18,7 +19,7 @@ public class WhenAddingSingleDocumentWithoutPartitionKeyValue : IClassFixture<Wh
 	 public class Fixture : FixtureBase
 	 {
 		  public EventDocument EventDocument { get; private set; } = new() {
-				Id = DocumentId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
+				Id = EventId.CreateNew(Guid.Parse("{A2966192-C1F9-4E2F-899F-84C4FB3E2075}")),
 				PartitionKey = null,
 				AggregateVersion = 1,
 				Timestamp = DateTime.UtcNow

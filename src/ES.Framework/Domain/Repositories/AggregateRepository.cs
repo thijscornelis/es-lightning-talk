@@ -16,23 +16,23 @@ public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IA
 	where TKey : ITypedIdentifier<TValue>
 	where TAggregate : Aggregate<TKey, TState>
 {
+	 private readonly IAggregatePartitionKeyResolver _aggregatePartitionKeyResolver;
 	 private readonly IDocumentRepository _documentRepository;
 	 private readonly IEventDocumentConverter _eventDocumentConverter;
-	 private readonly IPartitionKeyResolver _partitionKeyResolver;
 
 	 /// <summary>Initializes a new instance of the <see cref="AggregateRepository{TAggregate, TKey, TState, TValue}" /> class.</summary>
 	 /// <param name="documentRepository">The document repository.</param>
 	 /// <param name="eventDocumentConverter">The event document converter.</param>
-	 /// <param name="partitionKeyResolver">The partition key resolver.</param>
-	 public AggregateRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IPartitionKeyResolver partitionKeyResolver) {
+	 /// <param name="aggregatePartitionKeyResolver">The partition key resolver.</param>
+	 public AggregateRepository(IDocumentRepository documentRepository, IEventDocumentConverter eventDocumentConverter, IAggregatePartitionKeyResolver aggregatePartitionKeyResolver) {
 		  _documentRepository = documentRepository;
 		  _eventDocumentConverter = eventDocumentConverter;
-		  _partitionKeyResolver = partitionKeyResolver;
+		  _aggregatePartitionKeyResolver = aggregatePartitionKeyResolver;
 	 }
 
 	 /// <inheritdoc />
 	 public async Task<TAggregate> FindAsync(TKey id, CancellationToken cancellationToken) {
-		  var partitionKey = _partitionKeyResolver.CreateSyntheticPartitionKey<TAggregate, TKey, TState, TValue>(id);
+		  var partitionKey = _aggregatePartitionKeyResolver.CreatePartitionKey<TAggregate, TKey, TState, TValue>(id);
 		  var enumerable = _documentRepository.GetAsyncEnumerable<EventDocument>(partitionKey, cancellationToken: cancellationToken);
 
 		  var events = new EventCollection<TKey>();
@@ -60,7 +60,6 @@ public abstract class AggregateRepository<TAggregate, TKey, TState, TValue> : IA
 	 public async Task<TAggregate> SaveAsync(TAggregate aggregate, CancellationToken cancellationToken) {
 		  if(!aggregate.HasUncommittedEvents)
 				return aggregate;
-
 
 		  var documents = _eventDocumentConverter.ToEventDocuments<TAggregate, TKey, TState, TValue>(aggregate._uncommittedEvents);
 		  await _documentRepository.AddAsync(documents, cancellationToken);

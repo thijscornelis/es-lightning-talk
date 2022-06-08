@@ -1,10 +1,10 @@
 ﻿namespace ES.Framework.Domain.Aggregates.Attributes;
 
 /// <summary>Custom attribute that defines the layout of a PartitionKey for an Aggregate.</summary>
-public class AggregatePartitionKeyAttribute : Attribute
+public class PartitionKeyAttribute : Attribute
 {
 	 /// <inheritdoc />
-	 public AggregatePartitionKeyAttribute(string format) => Format = format;
+	 public PartitionKeyAttribute(string format) => Format = format;
 
 	 /// <summary>Gets the format.</summary>
 	 /// <value>The format.</value>

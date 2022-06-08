@@ -43,7 +43,7 @@ public class WhenUncommittedEventListContainsSingleItem : IClassFixture<WhenUnco
 		  document.AggregateId.Should().Be(_fixture.Aggregate.Id.Value);
 		  document.Payload.Should().Be(_fixture.Aggregate.UncommittedEvents.Single());
 		  document.AggregateType.Should().Be(typeof(TestAggregate).FullName);
-		  document.EventType.Should().Be(_fixture.Aggregate.UncommittedEvents.Single().GetType().AssemblyQualifiedName);
+		  document.PayloadType.Should().Be(_fixture.Aggregate.UncommittedEvents.Single().GetType().AssemblyQualifiedName);
 		  document.AggregateVersion.Should().Be(1);
 		  document.PartitionKey.Should().Be(_fixture.PartitionKey);
 	 }
@@ -59,6 +59,6 @@ public class WhenUncommittedEventListContainsSingleItem : IClassFixture<WhenUnco
 		  protected override TestAggregate ArrangeAggregate() => new(TestAggregateId.CreateNew(Guid.Parse("{4C4152E5-718A-46B2-97E9-FADA42F2D53C}")), "UNIT TEST NAME");
 
 		  /// <inheritdoc />
-		  protected override void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver> mock) => mock.Setup(x => x.CreateSyntheticPartitionKey<TestAggregate, TestAggregateId, TestAggregateState, Guid>(Aggregate.Id)).Returns(PartitionKey);
+		  protected override void ArrangePartitionKeyResolver(Mock<IAggregatePartitionKeyResolver> mock) => mock.Setup(x => x.CreatePartitionKey<TestAggregate, TestAggregateId, TestAggregateState, Guid>(Aggregate.Id)).Returns(PartitionKey);
 	 }
 }

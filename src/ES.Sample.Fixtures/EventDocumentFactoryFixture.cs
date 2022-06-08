@@ -26,7 +26,7 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 
 	 /// <summary>Gets the partition key resolver mock.</summary>
 	 /// <value>The partition key resolver mock.</value>
-	 public Mock<IPartitionKeyResolver> PartitionKeyResolverMock { get; } =
+	 public Mock<IAggregatePartitionKeyResolver> PartitionKeyResolverMock { get; } =
 		 new() { CallBase = true };
 
 	 /// <summary>Gets the result.</summary>
@@ -49,7 +49,7 @@ public abstract class EventDocumentFactoryFixture<TAggregate, TKey, TState, TVal
 	 protected virtual void ArrangeDateTimeProvider(Mock<IDateTimeProvider> mock) {
 	 }
 
-	 protected virtual void ArrangePartitionKeyResolver(Mock<IPartitionKeyResolver> mock) {
+	 protected virtual void ArrangePartitionKeyResolver(Mock<IAggregatePartitionKeyResolver> mock) {
 	 }
 
 	 /// <inheritdoc />

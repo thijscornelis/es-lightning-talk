@@ -6,7 +6,7 @@ using ES.Sample.Domain.Exceptions;
 namespace ES.Sample.Domain.Aggregates;
 
 /// <summary>The <see cref="BankAccount" /> aggregate root.</summary>
-[AggregatePartitionKey("{0}-{1:N}")]
+[PartitionKey("{0}-{1:N}")]
 public partial class BankAccount : Aggregate<BankAccountId, BankAccountState>
 {
 	 /// <summary>Initializes a new instance of the <see cref="BankAccount" /> class.</summary>

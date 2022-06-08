@@ -4,7 +4,7 @@ using ES.Framework.Domain.TypedIdentifiers.Design;
 namespace ES.Framework.Domain.Abstractions;
 
 /// <summary>Resolve PartitionKeys for aggregates</summary>
-public interface IPartitionKeyResolver
+public interface IAggregatePartitionKeyResolver
 {
 	 /// <summary>Creates the synthetic partition key.</summary>
 	 /// <param name="aggregateId">The aggregate identifier.</param>
@@ -13,7 +13,7 @@ public interface IPartitionKeyResolver
 	 /// <typeparam name="TState">The type of the state.</typeparam>
 	 /// <typeparam name="TValue">The type of the value.</typeparam>
 	 /// <returns>System.String.</returns>
-	 public string CreateSyntheticPartitionKey<TAggregate, TKey, TState, TValue>(TKey aggregateId)
+	 public string CreatePartitionKey<TAggregate, TKey, TState, TValue>(TKey aggregateId)
 		 where TAggregate : IAggregate<TKey, TState>
 		 where TState : class, IAggregateState<TKey>, new()
 		 where TKey : ITypedIdentifier<TValue>;
