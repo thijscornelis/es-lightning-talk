@@ -16,8 +16,7 @@ public class BankAccountProjector : Projector<BankAccountProjection>
 		  Handle<MoneyDeposited>(OnDeposit, e => BankAccountProjection.GetProjectionId(e.Id));
 	 }
 
-	 private BankAccountProjection OnCreated(BankAccountCreated @event, BankAccountProjection projection) => projection
-	with {
+	 private BankAccountProjection OnCreated(BankAccountCreated @event, BankAccountProjection projection) => projection with {
 		  Balance = 0,
 		  Name = @event.Name,
 		  NumberOfDeposits = 0,

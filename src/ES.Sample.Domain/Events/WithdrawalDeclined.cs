@@ -3,7 +3,7 @@ using ES.Sample.Domain.Aggregates;
 
 namespace ES.Sample.Domain.Events;
 
-/// <summary>Event used when withdrawal was refused because of account balance</summary>
+/// <summary>Event used when withdrawal was refused because of <see cref="BankAccountState.Balance"/></summary>
 public record WithdrawalDeclined : AggregateEvent<BankAccountId>
 {
 	 /// <summary>Gets or sets the attempted amount.</summary>

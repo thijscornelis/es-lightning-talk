@@ -3,7 +3,7 @@ using ES.Sample.Domain.Aggregates;
 
 namespace ES.Sample.Domain.Events;
 
-/// <summary>Event used when money is withdrawn from a <see cref="MoneyWithdrawn" /></summary>
+/// <summary>Event used when money is withdrawn from a <see cref="BankAccount" /></summary>
 public record MoneyWithdrawn : AggregateEvent<BankAccountId>
 {
 	 /// <summary>Gets the amount.</summary>
@@ -17,6 +17,8 @@ public record MoneyWithdrawn : AggregateEvent<BankAccountId>
 	 /// <summary>Gets the statement identifier.</summary>
 	 /// <value>The statement identifier.</value>
 	 public StatementId StatementId { get; init; }
+	 
+
 	 /// <inheritdoc />
 	 public MoneyWithdrawn(BankAccountId id) : base(id) {
 	 }
