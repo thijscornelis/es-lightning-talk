@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	 <PropertyGroup>
+		  <TargetFramework>net6.0</TargetFramework>
+		  <ImplicitUsings>enable</ImplicitUsings>
+		  
+		  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	 </PropertyGroup>
+
+	 <ItemGroup>
+	   <ProjectReference Include="..\ES.Framework\ES.Framework.csproj" />
+	   <ProjectReference Include="..\ES.Sample.Domain\ES.Sample.Domain.csproj" />
+	 </ItemGroup>
+
+</Project>
